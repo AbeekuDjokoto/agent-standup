@@ -25,9 +25,7 @@ Web app for agents to capture loan activity and export backend data as an Excel 
 
    `npm run dev`
 
-4. Open:
-
-   `http://localhost:4173`
+4. Open the frontend URL printed by Vite (usually `http://localhost:5173`).
 
 ## API endpoints
 
