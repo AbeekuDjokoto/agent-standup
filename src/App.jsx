@@ -1,82 +1,82 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import './App.css'
+import { LOCATION_OPTIONS } from './data/locationOptions'
 import { postAgentRecord } from './services/agentService'
 
-const LOCATION_OPTIONS = [
-  'Accra - 1',
-  'Accra - 2',
-  'Kumasi - 1',
-  'Kumasi - 2',
-  'Cape Coast',
-  'Ho',
-  'Koforidua',
-  'Tamale',
-  'Suyani',
-]
+const numberField = (fieldName, schema) =>
+  z.preprocess(
+    (value) => {
+      if (value === '' || value === undefined || value === null) {
+        return undefined
+      }
+      const parsedValue = Number(value)
+      return Number.isNaN(parsedValue) ? undefined : parsedValue
+    },
+    z.number({
+      required_error: `${fieldName} is required.`,
+      invalid_type_error: `${fieldName} must be a number.`,
+    }).pipe(schema),
+  )
+
+const formSchema = z.object({
+  fullName: z.string().trim().min(1, 'Full name is required.'),
+  applicationsCount: numberField(
+    'Applications count',
+    z
+      .number()
+      .int('Applications count must be a whole number.')
+      .min(0, 'Applications count must be 0 or greater.'),
+  ),
+  totalAmount: numberField(
+    'Total amount',
+    z.number().min(0, 'Total amount must be 0 or greater.'),
+  ),
+  location: z.array(z.string()).min(1, 'Select at least one location.'),
+})
 
 function App() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    applicationsCount: '',
-    totalAmount: '',
-    location: [],
-  })
-  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
-  const canSubmit = useMemo(() => {
-    const count = Number(formData.applicationsCount)
-    const totalAmount = Number(formData.totalAmount)
-    return (
-      formData.fullName.trim() &&
-      Number.isInteger(count) &&
-      count >= 0 &&
-      Number.isFinite(totalAmount) &&
-      totalAmount >= 0 &&
-      formData.location.length > 0
-    )
-  }, [formData])
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting, isValid },
+  } = useForm({
+    resolver: zodResolver(formSchema),
+    mode: 'onChange',
+    defaultValues: {
+      fullName: '',
+      applicationsCount: '',
+      totalAmount: '',
+      location: [],
+    },
+  })
 
-  function onFieldChange(event) {
-    const { name, value } = event.target
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }))
-  }
+  const selectedLocations = useWatch({
+    control,
+    name: 'location',
+  })
 
-  function onLocationChange(event) {
-    const { value, checked } = event.target
-    setFormData((previous) => ({
-      ...previous,
-      location: checked
-        ? [...previous.location, value]
-        : previous.location.filter((item) => item !== value),
-    }))
-  }
-
-  async function onSubmit(event) {
-    event.preventDefault()
-
-    if (!canSubmit) {
-      return
-    }
-
-    setSubmitting(true)
+  async function onSubmit(values) {
     setError('')
     setSuccessMessage('')
 
     try {
       const payload = {
-        fullName: formData.fullName.trim(),
-        applicationsCount: Number(formData.applicationsCount),
-        totalAmount: Number(formData.totalAmount),
-        location: formData.location,
+        fullName: values.fullName.trim(),
+        applicationsCount: values.applicationsCount,
+        totalAmount: values.totalAmount,
+        location: values.location,
         createdAt: new Date().toISOString(),
       }
       await postAgentRecord(payload)
-      setFormData({
+      reset({
         fullName: '',
         applicationsCount: '',
         totalAmount: '',
@@ -84,9 +84,11 @@ function App() {
       })
       setSuccessMessage('Record saved successfully.')
     } catch (requestError) {
-      setError(requestError.message)
-    } finally {
-      setSubmitting(false)
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Unable to save record.',
+      )
     }
   }
 
@@ -101,43 +103,49 @@ function App() {
 
       <section className="card">
         <h2>Application Inputs</h2>
-        <form className="entry-form" onSubmit={onSubmit}>
+        <form className="entry-form" onSubmit={handleSubmit(onSubmit)}>
           <label>
             Full name
             <input
-              name="fullName"
-              value={formData.fullName}
-              onChange={onFieldChange}
+              {...register('fullName')}
               placeholder="Abeeku Djokoto"
-              required
             />
           </label>
+          {errors.fullName && (
+            <p className="error" role="alert">
+              {errors.fullName.message}
+            </p>
+          )}
           <label>
             Applications count
             <input
-              name="applicationsCount"
               type="number"
               min="0"
               step="1"
-              value={formData.applicationsCount}
-              onChange={onFieldChange}
+              {...register('applicationsCount')}
               placeholder="0"
-              required
             />
           </label>
+          {errors.applicationsCount && (
+            <p className="error" role="alert">
+              {errors.applicationsCount.message}
+            </p>
+          )}
           <label>
             Total amount
             <input
-              name="totalAmount"
               type="number"
               min="0"
               step="0.01"
-              value={formData.totalAmount}
-              onChange={onFieldChange}
+              {...register('totalAmount')}
               placeholder="0.00"
-              required
             />
           </label>
+          {errors.totalAmount && (
+            <p className="error" role="alert">
+              {errors.totalAmount.message}
+            </p>
+          )}
           <fieldset className="location-fieldset">
             <legend>Location (select one or more)</legend>
             {LOCATION_OPTIONS.map((locationOption) => (
@@ -145,15 +153,20 @@ function App() {
                 <input
                   type="checkbox"
                   value={locationOption}
-                  checked={formData.location.includes(locationOption)}
-                  onChange={onLocationChange}
+                  {...register('location')}
+                  checked={selectedLocations?.includes(locationOption) ?? false}
                 />
                 {locationOption}
               </label>
             ))}
           </fieldset>
-          <button type="submit" disabled={!canSubmit || submitting}>
-            {submitting ? 'Saving...' : 'Save record'}
+          {errors.location && (
+            <p className="error" role="alert">
+              {errors.location.message}
+            </p>
+          )}
+          <button type="submit" disabled={!isValid || isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Save record'}
           </button>
         </form>
         {successMessage && <p>{successMessage}</p>}
