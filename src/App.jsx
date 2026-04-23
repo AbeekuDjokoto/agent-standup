@@ -1,75 +1,58 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import './App.css'
+import { postAgentRecord } from './services/agentService'
+
+const LOCATION_OPTIONS = [
+  'Accra - 1',
+  'Accra - 2',
+  'Kumasi - 1',
+  'Kumasi - 2',
+  'Cape Coast',
+  'Ho',
+  'Koforidua',
+  'Tamale',
+  'Suyani',
+]
 
 function App() {
   const [formData, setFormData] = useState({
-    location: '',
-    day: '',
-    numberOfApplications: '',
-    totalLoanValue: '',
-    firstName: '',
-    lastName: '',
+    fullName: '',
+    applicationsCount: '',
+    totalAmount: '',
+    location: [],
   })
-  const [entries, setEntries] = useState([])
-  const [summary, setSummary] = useState({
-    totalEntries: 0,
-    totalApplications: 0,
-    totalLoanValue: 0,
-    totalLoanValueFormatted: '0.00',
-  })
-  const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
 
   const canSubmit = useMemo(() => {
+    const count = Number(formData.applicationsCount)
+    const totalAmount = Number(formData.totalAmount)
     return (
-      formData.location &&
-      formData.day &&
-      formData.firstName &&
-      formData.lastName &&
-      formData.numberOfApplications !== '' &&
-      formData.totalLoanValue !== ''
+      formData.fullName.trim() &&
+      Number.isInteger(count) &&
+      count >= 0 &&
+      Number.isFinite(totalAmount) &&
+      totalAmount >= 0 &&
+      formData.location.length > 0
     )
   }, [formData])
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function loadEntries() {
-      try {
-        const response = await fetch('/api/loan-entries')
-        if (!response.ok) {
-          throw new Error('Unable to fetch entries.')
-        }
-
-        const data = await response.json()
-        if (!cancelled) {
-          setEntries(data.entries)
-          setSummary(data.summary)
-        }
-      } catch (requestError) {
-        if (!cancelled) {
-          setError(requestError.message)
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
-      }
-    }
-
-    loadEntries()
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   function onFieldChange(event) {
     const { name, value } = event.target
     setFormData((previous) => ({
       ...previous,
       [name]: value,
+    }))
+  }
+
+  function onLocationChange(event) {
+    const { value, checked } = event.target
+    setFormData((previous) => ({
+      ...previous,
+      location: checked
+        ? [...previous.location, value]
+        : previous.location.filter((item) => item !== value),
     }))
   }
 
@@ -82,41 +65,24 @@ function App() {
 
     setSubmitting(true)
     setError('')
+    setSuccessMessage('')
 
     try {
       const payload = {
+        fullName: formData.fullName.trim(),
+        applicationsCount: Number(formData.applicationsCount),
+        totalAmount: Number(formData.totalAmount),
         location: formData.location,
-        day: formData.day,
-        numberOfApplications: Number(formData.numberOfApplications),
-        totalLoanValue: Number(formData.totalLoanValue),
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        createdAt: new Date().toISOString(),
       }
-
-      const response = await fetch('/api/loan-entries', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        const body = await response.json()
-        throw new Error(body.message || 'Unable to submit entry.')
-      }
-
-      const data = await response.json()
-      setEntries((current) => [data.entry, ...current])
-      setSummary(data.summary)
+      await postAgentRecord(payload)
       setFormData({
-        location: '',
-        day: '',
-        numberOfApplications: '',
-        totalLoanValue: '',
-        firstName: '',
-        lastName: '',
+        fullName: '',
+        applicationsCount: '',
+        totalAmount: '',
+        location: [],
       })
+      setSuccessMessage('Record saved successfully.')
     } catch (requestError) {
       setError(requestError.message)
     } finally {
@@ -124,157 +90,77 @@ function App() {
     }
   }
 
-  const exportUrl = '/api/loan-entries/export'
-
   return (
     <main className="page">
       <header className="page-header">
-        <h1>Loan Activity Tracker</h1>
+        <h1>New Application Record</h1>
         <p>
-          Enter daily loan activity by agent and export an Excel report for backend
-          reporting.
+          Fill the required inputs and save them to Firebase.
         </p>
       </header>
 
-      <section className="card summary-grid" aria-label="Portfolio summary">
-        <article>
-          <h2>Total records</h2>
-          <p>{summary.totalEntries}</p>
-        </article>
-        <article>
-          <h2>Total applications</h2>
-          <p>{summary.totalApplications}</p>
-        </article>
-        <article>
-          <h2>Total loan value</h2>
-          <p>${summary.totalLoanValueFormatted}</p>
-        </article>
-      </section>
-
       <section className="card">
-        <h2>New loan entry</h2>
+        <h2>Application Inputs</h2>
         <form className="entry-form" onSubmit={onSubmit}>
           <label>
-            Location
+            Full name
             <input
-              name="location"
-              value={formData.location}
+              name="fullName"
+              value={formData.fullName}
               onChange={onFieldChange}
-              placeholder="Johannesburg"
+              placeholder="Abeeku Djokoto"
               required
             />
           </label>
           <label>
-            Day
+            Applications count
             <input
-              name="day"
-              type="date"
-              value={formData.day}
-              onChange={onFieldChange}
-              required
-            />
-          </label>
-          <label>
-            Number of applications
-            <input
-              name="numberOfApplications"
+              name="applicationsCount"
               type="number"
               min="0"
-              value={formData.numberOfApplications}
+              step="1"
+              value={formData.applicationsCount}
               onChange={onFieldChange}
-              placeholder="8"
+              placeholder="0"
               required
             />
           </label>
           <label>
-            Total value of loans
+            Total amount
             <input
-              name="totalLoanValue"
+              name="totalAmount"
               type="number"
               min="0"
               step="0.01"
-              value={formData.totalLoanValue}
+              value={formData.totalAmount}
               onChange={onFieldChange}
-              placeholder="125000.00"
+              placeholder="0.00"
               required
             />
           </label>
-          <label>
-            First name
-            <input
-              name="firstName"
-              value={formData.firstName}
-              onChange={onFieldChange}
-              placeholder="Anele"
-              required
-            />
-          </label>
-          <label>
-            Last name
-            <input
-              name="lastName"
-              value={formData.lastName}
-              onChange={onFieldChange}
-              placeholder="Nkosi"
-              required
-            />
-          </label>
+          <fieldset className="location-fieldset">
+            <legend>Location (select one or more)</legend>
+            {LOCATION_OPTIONS.map((locationOption) => (
+              <label key={locationOption} className="checkbox-label">
+                <input
+                  type="checkbox"
+                  value={locationOption}
+                  checked={formData.location.includes(locationOption)}
+                  onChange={onLocationChange}
+                />
+                {locationOption}
+              </label>
+            ))}
+          </fieldset>
           <button type="submit" disabled={!canSubmit || submitting}>
-            {submitting ? 'Saving...' : 'Save entry'}
+            {submitting ? 'Saving...' : 'Save record'}
           </button>
         </form>
+        {successMessage && <p>{successMessage}</p>}
         {error && (
           <p className="error" role="alert">
             {error}
           </p>
-        )}
-      </section>
-
-      <section className="card">
-        <div className="section-header">
-          <h2>Submitted loan entries</h2>
-          <a className="button-link" href={exportUrl}>
-            Export to Excel
-          </a>
-        </div>
-
-        {loading ? (
-          <p>Loading entries...</p>
-        ) : entries.length === 0 ? (
-          <p>No entries yet. Add your first loan activity above.</p>
-        ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Agent</th>
-                  <th>Location</th>
-                  <th>Day</th>
-                  <th>Applications</th>
-                  <th>Total value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map((entry) => (
-                  <tr key={entry.id}>
-                    <td>
-                      {entry.firstName} {entry.lastName}
-                    </td>
-                    <td>{entry.location}</td>
-                    <td>{entry.day}</td>
-                    <td>{entry.numberOfApplications}</td>
-                    <td>
-                      $
-                      {entry.totalLoanValue.toLocaleString('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         )}
       </section>
     </main>

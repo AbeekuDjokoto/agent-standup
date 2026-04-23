@@ -84,6 +84,36 @@
   background: var(--bg);
 }
 
+.location-fieldset {
+  grid-column: 1 / -1;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.location-fieldset legend {
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.checkbox-label input {
+  margin: 0;
+}
+
 .entry-form button {
   grid-column: 1 / -1;
   border: none;
@@ -163,6 +193,10 @@ th {
   }
 
   .entry-form {
+    grid-template-columns: 1fr;
+  }
+
+  .location-fieldset {
     grid-template-columns: 1fr;
   }
 }
