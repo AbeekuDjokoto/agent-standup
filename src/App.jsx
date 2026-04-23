@@ -32,28 +32,37 @@ function App() {
     )
   }, [formData])
 
-  async function loadEntries() {
-    setLoading(true)
-    setError('')
-
-    try {
-      const response = await fetch('/api/loan-entries')
-      if (!response.ok) {
-        throw new Error('Unable to fetch entries.')
-      }
-
-      const data = await response.json()
-      setEntries(data.entries)
-      setSummary(data.summary)
-    } catch (requestError) {
-      setError(requestError.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
+    let cancelled = false
+
+    async function loadEntries() {
+      try {
+        const response = await fetch('/api/loan-entries')
+        if (!response.ok) {
+          throw new Error('Unable to fetch entries.')
+        }
+
+        const data = await response.json()
+        if (!cancelled) {
+          setEntries(data.entries)
+          setSummary(data.summary)
+        }
+      } catch (requestError) {
+        if (!cancelled) {
+          setError(requestError.message)
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
     loadEntries()
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   function onFieldChange(event) {
