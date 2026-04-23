@@ -1,121 +1,274 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [formData, setFormData] = useState({
+    location: '',
+    day: '',
+    numberOfApplications: '',
+    totalLoanValue: '',
+    firstName: '',
+    lastName: '',
+  })
+  const [entries, setEntries] = useState([])
+  const [summary, setSummary] = useState({
+    totalEntries: 0,
+    totalApplications: 0,
+    totalLoanValue: 0,
+    totalLoanValueFormatted: '0.00',
+  })
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const canSubmit = useMemo(() => {
+    return (
+      formData.location &&
+      formData.day &&
+      formData.firstName &&
+      formData.lastName &&
+      formData.numberOfApplications !== '' &&
+      formData.totalLoanValue !== ''
+    )
+  }, [formData])
+
+  async function loadEntries() {
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/loan-entries')
+      if (!response.ok) {
+        throw new Error('Unable to fetch entries.')
+      }
+
+      const data = await response.json()
+      setEntries(data.entries)
+      setSummary(data.summary)
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadEntries()
+  }, [])
+
+  function onFieldChange(event) {
+    const { name, value } = event.target
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }))
+  }
+
+  async function onSubmit(event) {
+    event.preventDefault()
+
+    if (!canSubmit) {
+      return
+    }
+
+    setSubmitting(true)
+    setError('')
+
+    try {
+      const payload = {
+        location: formData.location,
+        day: formData.day,
+        numberOfApplications: Number(formData.numberOfApplications),
+        totalLoanValue: Number(formData.totalLoanValue),
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      }
+
+      const response = await fetch('/api/loan-entries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const body = await response.json()
+        throw new Error(body.message || 'Unable to submit entry.')
+      }
+
+      const data = await response.json()
+      setEntries((current) => [data.entry, ...current])
+      setSummary(data.summary)
+      setFormData({
+        location: '',
+        day: '',
+        numberOfApplications: '',
+        totalLoanValue: '',
+        firstName: '',
+        lastName: '',
+      })
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const exportUrl = '/api/loan-entries/export'
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+    <main className="page">
+      <header className="page-header">
+        <h1>Loan Activity Tracker</h1>
+        <p>
+          Enter daily loan activity by agent and export an Excel report for backend
+          reporting.
+        </p>
+      </header>
+
+      <section className="card summary-grid" aria-label="Portfolio summary">
+        <article>
+          <h2>Total records</h2>
+          <p>{summary.totalEntries}</p>
+        </article>
+        <article>
+          <h2>Total applications</h2>
+          <p>{summary.totalApplications}</p>
+        </article>
+        <article>
+          <h2>Total loan value</h2>
+          <p>${summary.totalLoanValueFormatted}</p>
+        </article>
+      </section>
+
+      <section className="card">
+        <h2>New loan entry</h2>
+        <form className="entry-form" onSubmit={onSubmit}>
+          <label>
+            Location
+            <input
+              name="location"
+              value={formData.location}
+              onChange={onFieldChange}
+              placeholder="Johannesburg"
+              required
+            />
+          </label>
+          <label>
+            Day
+            <input
+              name="day"
+              type="date"
+              value={formData.day}
+              onChange={onFieldChange}
+              required
+            />
+          </label>
+          <label>
+            Number of applications
+            <input
+              name="numberOfApplications"
+              type="number"
+              min="0"
+              value={formData.numberOfApplications}
+              onChange={onFieldChange}
+              placeholder="8"
+              required
+            />
+          </label>
+          <label>
+            Total value of loans
+            <input
+              name="totalLoanValue"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.totalLoanValue}
+              onChange={onFieldChange}
+              placeholder="125000.00"
+              required
+            />
+          </label>
+          <label>
+            First name
+            <input
+              name="firstName"
+              value={formData.firstName}
+              onChange={onFieldChange}
+              placeholder="Anele"
+              required
+            />
+          </label>
+          <label>
+            Last name
+            <input
+              name="lastName"
+              value={formData.lastName}
+              onChange={onFieldChange}
+              placeholder="Nkosi"
+              required
+            />
+          </label>
+          <button type="submit" disabled={!canSubmit || submitting}>
+            {submitting ? 'Saving...' : 'Save entry'}
+          </button>
+        </form>
+        {error && (
+          <p className="error" role="alert">
+            {error}
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+        )}
       </section>
 
-      <div className="ticks"></div>
+      <section className="card">
+        <div className="section-header">
+          <h2>Submitted loan entries</h2>
+          <a className="button-link" href={exportUrl}>
+            Export to Excel
+          </a>
+        </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
+        {loading ? (
+          <p>Loading entries...</p>
+        ) : entries.length === 0 ? (
+          <p>No entries yet. Add your first loan activity above.</p>
+        ) : (
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Agent</th>
+                  <th>Location</th>
+                  <th>Day</th>
+                  <th>Applications</th>
+                  <th>Total value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((entry) => (
+                  <tr key={entry.id}>
+                    <td>
+                      {entry.firstName} {entry.lastName}
+                    </td>
+                    <td>{entry.location}</td>
+                    <td>{entry.day}</td>
+                    <td>{entry.numberOfApplications}</td>
+                    <td>
+                      $
+                      {entry.totalLoanValue.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 
