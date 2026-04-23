@@ -1,121 +1,169 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useMemo, useState } from 'react'
 import './App.css'
+import { postAgentRecord } from './services/agentService'
+
+const LOCATION_OPTIONS = [
+  'Accra - 1',
+  'Accra - 2',
+  'Kumasi - 1',
+  'Kumasi - 2',
+  'Cape Coast',
+  'Ho',
+  'Koforidua',
+  'Tamale',
+  'Suyani',
+]
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [formData, setFormData] = useState({
+    fullName: '',
+    applicationsCount: '',
+    totalAmount: '',
+    location: [],
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+
+  const canSubmit = useMemo(() => {
+    const count = Number(formData.applicationsCount)
+    const totalAmount = Number(formData.totalAmount)
+    return (
+      formData.fullName.trim() &&
+      Number.isInteger(count) &&
+      count >= 0 &&
+      Number.isFinite(totalAmount) &&
+      totalAmount >= 0 &&
+      formData.location.length > 0
+    )
+  }, [formData])
+
+  function onFieldChange(event) {
+    const { name, value } = event.target
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }))
+  }
+
+  function onLocationChange(event) {
+    const { value, checked } = event.target
+    setFormData((previous) => ({
+      ...previous,
+      location: checked
+        ? [...previous.location, value]
+        : previous.location.filter((item) => item !== value),
+    }))
+  }
+
+  async function onSubmit(event) {
+    event.preventDefault()
+
+    if (!canSubmit) {
+      return
+    }
+
+    setSubmitting(true)
+    setError('')
+    setSuccessMessage('')
+
+    try {
+      const payload = {
+        fullName: formData.fullName.trim(),
+        applicationsCount: Number(formData.applicationsCount),
+        totalAmount: Number(formData.totalAmount),
+        location: formData.location,
+        createdAt: new Date().toISOString(),
+      }
+      await postAgentRecord(payload)
+      setFormData({
+        fullName: '',
+        applicationsCount: '',
+        totalAmount: '',
+        location: [],
+      })
+      setSuccessMessage('Record saved successfully.')
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+    <main className="page">
+      <header className="page-header">
+        <h1>New Application Record</h1>
+        <p>
+          Fill the required inputs and save them to Firebase.
+        </p>
+      </header>
+
+      <section className="card">
+        <h2>Application Inputs</h2>
+        <form className="entry-form" onSubmit={onSubmit}>
+          <label>
+            Full name
+            <input
+              name="fullName"
+              value={formData.fullName}
+              onChange={onFieldChange}
+              placeholder="Abeeku Djokoto"
+              required
+            />
+          </label>
+          <label>
+            Applications count
+            <input
+              name="applicationsCount"
+              type="number"
+              min="0"
+              step="1"
+              value={formData.applicationsCount}
+              onChange={onFieldChange}
+              placeholder="0"
+              required
+            />
+          </label>
+          <label>
+            Total amount
+            <input
+              name="totalAmount"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.totalAmount}
+              onChange={onFieldChange}
+              placeholder="0.00"
+              required
+            />
+          </label>
+          <fieldset className="location-fieldset">
+            <legend>Location (select one or more)</legend>
+            {LOCATION_OPTIONS.map((locationOption) => (
+              <label key={locationOption} className="checkbox-label">
+                <input
+                  type="checkbox"
+                  value={locationOption}
+                  checked={formData.location.includes(locationOption)}
+                  onChange={onLocationChange}
+                />
+                {locationOption}
+              </label>
+            ))}
+          </fieldset>
+          <button type="submit" disabled={!canSubmit || submitting}>
+            {submitting ? 'Saving...' : 'Save record'}
+          </button>
+        </form>
+        {successMessage && <p>{successMessage}</p>}
+        {error && (
+          <p className="error" role="alert">
+            {error}
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+        )}
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 
