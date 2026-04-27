@@ -86,7 +86,6 @@ export const DailyApplicationUpdates = () => {
       try {
         setIsLoading(true);
         const records = await fetchAgentRecords(currentUser.uid);
-        console.log('Fetched daily updates records:', records);
 
         const normalizedRecords: DailyUpdateRecord[] = records.map((record) => {
           const rawStatus = String(record.status ?? 'Submitted');
@@ -109,9 +108,6 @@ export const DailyApplicationUpdates = () => {
 
         setDailyUpdates(normalizedRecords);
       } catch (error) {
-        // Keep full raw error available in dev tools even if toast truncates.
-        console.error('Failed to fetch daily updates:', error);
-
         if (isFirebaseIndexError(error)) {
           toast.error(
             'Firestore index required. Open Firebase Console -> Firestore Database -> Indexes and create the suggested composite index for agentUid + createdAt.',
