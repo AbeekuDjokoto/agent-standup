@@ -187,6 +187,6 @@ app.get('/api/loan-entries/export', async (_req, res) => {
 
 app.listen(port, () => {
   console.log(
-    `Loan tracker up and running backend running on http://localhost:${port}`,
+    `Loan activity tracker backend running on http://localhost:${port}`,
   );
 });
