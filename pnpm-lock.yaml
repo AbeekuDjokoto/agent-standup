@@ -26,6 +26,9 @@ importers:
       cors:
         specifier: ^2.8.6
         version: 2.8.6
+      dayjs:
+        specifier: ^1.11.20
+        version: 1.11.20
       defu:
         specifier: ^6.1.7
         version: 6.1.7
