@@ -10,8 +10,8 @@ export const AuthLayout = () => {
   return (
     <>
       {userLoggedIn ? <Navigate to={ROUTES.user.dashboard.overview} replace /> : null}
-      <main className="min-h-screen bg-[#f9fafa] p-4">
-        <section className="mx-auto grid min-h-[calc(100vh-2rem)] w-full  grid-cols-1 items-center gap-6 rounded-[24px] bg-[#f9fafa] lg:grid-cols-[minmax(480px,1.15fr)_minmax(420px,1fr)]">
+      <main className="min-h-dvh bg-[#f9fafa] p-0 sm:p-4">
+        <section className="mx-auto grid min-h-dvh w-full grid-cols-1 items-center gap-6 bg-[#f9fafa] sm:min-h-[calc(100vh-2rem)] sm:rounded-[24px] lg:grid-cols-[minmax(480px,1.15fr)_minmax(420px,1fr)]">
           <aside className="relative hidden h-[calc(100vh-3.25rem)] min-h-[600px] overflow-hidden rounded-[22px] lg:block">
             <img
               src={heroImageUrl}
