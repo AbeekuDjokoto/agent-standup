@@ -6,6 +6,7 @@ import { fetchAgentRecords } from '@/services/agentService';
 import { useAuth } from '@/context/authContext';
 import { useToast } from '@/hooks';
 import { generateAndDownloadCsv, type CsvHeader } from '@/utils/generateAndDownloadCsv';
+import { isWeekendInTimeZone } from '@/utils/businessDays';
 
 type DailyUpdateRecord = {
   id: string;
@@ -74,6 +75,7 @@ export const DailyApplicationUpdates = () => {
   const toast = useToast();
   const [dailyUpdates, setDailyUpdates] = useState<DailyUpdateRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const isNewUpdateBlocked = isWeekendInTimeZone();
 
   useEffect(() => {
     async function loadDailyUpdates() {
@@ -145,7 +147,6 @@ export const DailyApplicationUpdates = () => {
     }
 
     const headers: CsvHeader[] = [
-      { name: 'Update ID', accessor: 'id' },
       { name: 'Agent Name', accessor: 'agentName' },
       { name: 'Plan', accessor: 'plan' },
       { name: 'Location', accessor: 'location' },
@@ -176,12 +177,21 @@ export const DailyApplicationUpdates = () => {
                 Track all applications submitted by you and commissions earned.
               </p>
             </div>
-            <Link
-              to={ROUTES.user.dashboard.newDailyApplicationUpdate}
-              className="inline-flex items-center justify-center rounded-lg bg-[#fc9b1e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#e68912]"
-            >
-              + New Daily Update
-            </Link>
+            {isNewUpdateBlocked ? (
+              <span
+                className="inline-flex cursor-not-allowed items-center justify-center rounded-lg bg-neutral-grey-200 px-4 py-2 text-sm font-semibold text-neutral-grey-500"
+                title="Daily updates are only available Monday–Friday (Ghana time)."
+              >
+                + New Daily Update
+              </span>
+            ) : (
+              <Link
+                to={ROUTES.user.dashboard.newDailyApplicationUpdate}
+                className="inline-flex items-center justify-center rounded-lg bg-[#fc9b1e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#e68912]"
+              >
+                + New Daily Update
+              </Link>
+            )}
           </div>
         </section>
 
@@ -253,9 +263,6 @@ export const DailyApplicationUpdates = () => {
               <thead className="bg-neutral-grey-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-grey-500">
-                    Update ID
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-grey-500">
                     Agent
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-grey-500">
@@ -283,7 +290,7 @@ export const DailyApplicationUpdates = () => {
                   <tr>
                     <td
                       className="px-4 py-6 text-sm text-neutral-grey-500"
-                      colSpan={8}
+                      colSpan={7}
                     >
                       Loading daily updates...
                     </td>
@@ -293,7 +300,7 @@ export const DailyApplicationUpdates = () => {
                   <tr>
                     <td
                       className="px-4 py-6 text-sm text-neutral-grey-500"
-                      colSpan={8}
+                      colSpan={7}
                     >
                       No daily updates found yet. Click <strong>+ New Daily Update</strong> to
                       create one.
@@ -302,9 +309,6 @@ export const DailyApplicationUpdates = () => {
                 ) : null}
                 {!isLoading && dailyUpdates.map((item) => (
                   <tr key={item.id}>
-                    <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-neutral-grey-600">
-                      {item.id}
-                    </td>
                     <td className="whitespace-nowrap px-4 py-3 text-sm text-neutral-grey-600">
                       {item.agentName}
                     </td>

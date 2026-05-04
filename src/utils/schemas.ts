@@ -5,12 +5,16 @@ import isNumeric from 'validator/es/lib/isNumeric';
 import z from 'zod';
 
 export function getNumericStringSchema(label: string = 'Field') {
+  const requiredMsg = `${label} is required`;
+  const invalidMsg = `${label} must be a valid number`;
   return z.union([
     z
       .string()
-      .refine((val) => isNumeric(val), `${label} must be a valid number`)
+      .trim()
+      .min(1, requiredMsg)
+      .refine((val) => isNumeric(val), invalidMsg)
       .transform((val) => Number(val)),
-    z.number({ error: `${label} is required` }),
+    z.number({ error: requiredMsg }),
   ]);
 }
 export function getRequiredStringSchema(label: string = 'Field') {

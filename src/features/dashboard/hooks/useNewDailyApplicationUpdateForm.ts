@@ -8,6 +8,7 @@ import { useAuth } from '@/context/authContext';
 import { useToast } from '@/hooks';
 import { postAgentRecord } from '@/services/agentService';
 import { ROUTES } from '@/utils/route-constants';
+import { isWeekendInTimeZone } from '@/utils/businessDays';
 import {
   newDailyApplicationUpdateSchema,
   type NewDailyApplicationUpdateValues,
@@ -35,15 +36,24 @@ export function useNewDailyApplicationUpdateForm() {
     defaultValues: {
       fullName: currentUser?.displayName ?? '',
       location: '',
-      applicationsCount: 0,
-      totalAmount: 0,
+      applicationsCount: '',
+      totalAmount: '',
       updateDate: new Date(),
     },
   });
 
+  const isWeekendBlocked = isWeekendInTimeZone();
+
   const onSubmit = async (values: NewDailyApplicationUpdateValues) => {
     if (!currentUser?.uid) {
       toast.error('You must be logged in to submit an update.');
+      return;
+    }
+
+    if (isWeekendInTimeZone()) {
+      toast.error(
+        'Daily updates cannot be submitted on Saturday or Sunday (Ghana time).',
+      );
       return;
     }
 
@@ -75,5 +85,6 @@ export function useNewDailyApplicationUpdateForm() {
     control,
     formState: { errors, isSubmitting, isValid },
     onFormSubmit,
+    isWeekendBlocked,
   };
 }

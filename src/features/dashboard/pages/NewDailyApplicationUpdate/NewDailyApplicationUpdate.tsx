@@ -17,6 +17,7 @@ export const NewDailyApplicationUpdate = () => {
     control,
     formState: { errors, isSubmitting, isValid },
     onFormSubmit,
+    isWeekendBlocked,
   } = useNewDailyApplicationUpdateForm();
 
   return (
@@ -43,12 +44,22 @@ export const NewDailyApplicationUpdate = () => {
             </p>
           </div>
 
+          {isWeekendBlocked ? (
+            <div
+              className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"
+              role="status"
+            >
+              New daily updates are only available Monday–Friday (Ghana time). Please
+              come back on the next business day.
+            </div>
+          ) : null}
+
           <form className="grid gap-4 md:grid-cols-2" onSubmit={onFormSubmit}>
             <Input
               label="Agent Full Name"
               placeholder="e.g. Abeeku Djokoto"
               error={errors.fullName?.message}
-              {...register('fullName')}
+              {...register('fullName', { disabled: isWeekendBlocked })}
             />
 
             <div className="space-y-1.5">
@@ -60,8 +71,8 @@ export const NewDailyApplicationUpdate = () => {
               </label>
               <select
                 id="location"
-                className="h-[42px] w-full rounded-[10px] border border-neutral-grey-100 bg-white px-3 text-sm text-neutral-grey-600 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] outline-none focus:border-brand-primary"
-                {...register('location')}
+                className="h-[42px] w-full rounded-[10px] border border-neutral-grey-100 bg-white px-3 text-sm text-neutral-grey-600 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] outline-none focus:border-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
+                {...register('location', { disabled: isWeekendBlocked })}
               >
                 <option value="">Select location</option>
                 {LOCATION_OPTIONS.map((option) => (
@@ -79,19 +90,19 @@ export const NewDailyApplicationUpdate = () => {
               label="Applications Count"
               type="number"
               min={0}
-              placeholder="0"
+              placeholder="e.g. 12"
               error={errors.applicationsCount?.message}
-              {...register('applicationsCount')}
+              {...register('applicationsCount', { disabled: isWeekendBlocked })}
             />
 
             <Input
-              label="Commission Amount (GHS)"
+              label="Loan Amount (GHS)"
               type="number"
               min={0}
               step="0.01"
-              placeholder="0.00"
+              placeholder="e.g. 15000.00"
               error={errors.totalAmount?.message}
-              {...register('totalAmount')}
+              {...register('totalAmount', { disabled: isWeekendBlocked })}
             />
 
             <Controller
@@ -106,6 +117,7 @@ export const NewDailyApplicationUpdate = () => {
                     field.onChange(date instanceof Date ? date : null)
                   }
                   error={errors.updateDate?.message}
+                  disabled={isWeekendBlocked}
                   innerClassName="h-[42px] rounded-[10px] border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]"
                 />
               )}
@@ -123,7 +135,7 @@ export const NewDailyApplicationUpdate = () => {
               <Button
                 type="submit"
                 size="medium"
-                disabled={!isValid || isSubmitting}
+                disabled={isWeekendBlocked || !isValid || isSubmitting}
                 loading={isSubmitting}
               >
                 Save Daily Update

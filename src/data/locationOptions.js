@@ -7,5 +7,5 @@ export const LOCATION_OPTIONS = [
   'Ho',
   'Koforidua',
   'Tamale',
-  'Suyani',
+  'Sunyani',
 ]

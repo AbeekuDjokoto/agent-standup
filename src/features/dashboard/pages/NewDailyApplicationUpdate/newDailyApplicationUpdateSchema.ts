@@ -9,7 +9,7 @@ export const newDailyApplicationUpdateSchema = z.object({
   fullName: getRequiredStringSchema('Agent full name'),
   location: getRequiredStringSchema('Location'),
   applicationsCount: getNumericStringSchema('Applications count'),
-  totalAmount: getNumericStringSchema('Commission amount'),
+  totalAmount: getNumericStringSchema('Loan amount'),
   updateDate: getRequiredDateSchema('Update date'),
 });
 
