@@ -8,7 +8,7 @@ import {
   useDailyUpdatesList,
   type DateFilterPreset,
 } from '@/features/dashboard/hooks/useDailyUpdatesList';
-import { useToast } from '@/hooks';
+import { FormAlert } from '@/components/FormAlert';
 import { fetchDailyActivityById } from '@/services/activityService';
 import type { DailyActivityItem } from '@/types/activity';
 import { ROUTES } from '@/utils/route-constants';
@@ -48,7 +48,6 @@ export function DailyUpdatesPanel({
   recentHeading = 'Recent Daily Updates',
   mobileRecentHeading = 'Recent',
 }: DailyUpdatesPanelProps) {
-  const toast = useToast();
   const {
     isAdmin,
     dailyUpdates,
@@ -56,6 +55,7 @@ export function DailyUpdatesPanel({
     dateFilter,
     setDateFilter,
     isLoading,
+    loadError,
     reload,
   } = useDailyUpdatesList({ isAdminView });
 
@@ -66,11 +66,14 @@ export function DailyUpdatesPanel({
   );
   const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
   const [selectedAgentUuid, setSelectedAgentUuid] = useState<string | null>(null);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [exportHint, setExportHint] = useState<string | null>(null);
 
   const isNewUpdateBlocked = isWeekendInTimeZone();
   const showNewButton = showCreateButton && !isAdmin;
 
   async function handleRowClick(id: string) {
+    setDetailError(null);
     setIsDetailModalOpen(true);
     setIsDetailLoading(true);
     setActivityDetail(null);
@@ -79,7 +82,7 @@ export function DailyUpdatesPanel({
       const { daily_activity } = await fetchDailyActivityById(id);
       setActivityDetail(daily_activity);
     } catch (error) {
-      toast.error(
+      setDetailError(
         getApiErrorMessage(error, 'Unable to load daily update details.'),
       );
       setIsDetailModalOpen(false);
@@ -115,9 +118,11 @@ export function DailyUpdatesPanel({
 
   function handleExport() {
     if (dailyUpdates.length === 0) {
-      toast.info('No daily updates available to export yet.');
+      setExportHint('No daily updates available to export yet.');
       return;
     }
+
+    setExportHint(null);
 
     const headers: CsvHeader[] = [
       { name: 'Agent Name', accessor: 'agentName' },
@@ -193,6 +198,14 @@ export function DailyUpdatesPanel({
 
       <DailyUpdatesSummary stats={summaryStats} />
 
+      {loadError ? (
+        <FormAlert className="rounded-xl">{loadError}</FormAlert>
+      ) : null}
+
+      {detailError ? (
+        <FormAlert className="rounded-xl">{detailError}</FormAlert>
+      ) : null}
+
       <section className="rounded-xl bg-white">
         <div className="flex flex-col gap-2 border-b border-neutral-grey-100 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:p-4">
           <h2 className="text-base font-semibold text-neutral-grey-600 md:text-lg">
@@ -204,7 +217,10 @@ export function DailyUpdatesPanel({
               <button
                 key={preset}
                 type="button"
-                onClick={() => setDateFilter(preset)}
+                onClick={() => {
+                  setExportHint(null);
+                  setDateFilter(preset);
+                }}
                 className={filterButtonClass(dateFilter === preset)}
               >
                 {preset === 'today' ? 'Today' : preset === 'week' ? 'This Week' : 'All'}
@@ -219,6 +235,12 @@ export function DailyUpdatesPanel({
             </button>
           </div>
         </div>
+
+        {exportHint ? (
+          <div className="border-b border-neutral-grey-100 px-3 pb-3 sm:px-4">
+            <FormAlert variant="info">{exportHint}</FormAlert>
+          </div>
+        ) : null}
 
         <div className="space-y-2.5 p-3 md:hidden">
           {isLoading ? (

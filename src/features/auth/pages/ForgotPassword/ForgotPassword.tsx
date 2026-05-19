@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from 'react-router-dom';
 
 import { Button } from '@/components/Button';
+import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
 import userLineIcon from '@/assets/svgs/user-line.svg';
 import { ROUTES } from '@/utils/route-constants';
@@ -51,6 +52,9 @@ function ForgotPasswordRequestForm() {
         </Button>
       ) : (
         <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
+          {errors.root?.message ? (
+            <FormAlert>{errors.root.message}</FormAlert>
+          ) : null}
           <Input
             label="Email Address"
             type="email"

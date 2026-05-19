@@ -7,7 +7,6 @@ import {
   acceptAdminInviteNewUserSchema,
   type AcceptAdminInviteNewUserValues,
 } from '@/features/auth/pages/AcceptAdminInvite/acceptAdminInviteSchema';
-import { useToast } from '@/hooks';
 import { acceptAdminInvite } from '@/services/authService';
 import { useAuthStore } from '@/stores';
 import { getPostLoginPath, getUserRoles } from '@/utils/auth';
@@ -16,7 +15,6 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 export type AcceptAdminInviteMode = 'existing' | 'new';
 
 export function useAcceptAdminInviteForm() {
-  const toast = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token')?.trim() ?? '';
@@ -26,10 +24,13 @@ export function useAcceptAdminInviteForm() {
 
   const [mode, setMode] = useState<AcceptAdminInviteMode>('existing');
   const [isAcceptingExisting, setIsAcceptingExisting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors, isValid, isSubmitting },
   } = useForm<AcceptAdminInviteNewUserValues>({
     resolver: zodResolver(acceptAdminInviteNewUserSchema),
@@ -41,16 +42,22 @@ export function useAcceptAdminInviteForm() {
     },
   });
 
+  function clearSubmitError() {
+    setSubmitError(null);
+    clearErrors('root');
+  }
+
   function completeSession(response: Awaited<ReturnType<typeof acceptAdminInvite>>) {
     const user = authenticateFromLoginResponse(response);
     const roles = getUserRoles(user);
-    toast.success('Administrator access granted. Welcome!');
     navigate(getPostLoginPath(roles), { replace: true });
   }
 
   async function acceptWithTokenOnly() {
+    clearSubmitError();
+
     if (!token) {
-      toast.error('Invitation link is invalid or missing a token.');
+      setSubmitError('Invitation link is invalid or missing a token.');
       return;
     }
 
@@ -61,7 +68,7 @@ export function useAcceptAdminInviteForm() {
     } catch (error) {
       const apiError = error as { status?: number; message?: string };
       if (apiError.status === 422) {
-        toast.error(
+        setSubmitError(
           apiError.message ||
             'Additional details are required. Switch to “New account” and complete the form.',
         );
@@ -69,7 +76,7 @@ export function useAcceptAdminInviteForm() {
         return;
       }
 
-      toast.error(
+      setSubmitError(
         getApiErrorMessage(
           error,
           'Unable to accept invitation. The link may have expired.',
@@ -81,8 +88,10 @@ export function useAcceptAdminInviteForm() {
   }
 
   async function onSubmitNewUser(values: AcceptAdminInviteNewUserValues) {
+    clearSubmitError();
+
     if (!token) {
-      toast.error('Invitation link is invalid or missing a token.');
+      setSubmitError('Invitation link is invalid or missing a token.');
       return;
     }
 
@@ -95,21 +104,28 @@ export function useAcceptAdminInviteForm() {
       });
       completeSession(response);
     } catch (error) {
-      toast.error(
-        getApiErrorMessage(
+      setError('root', {
+        type: 'server',
+        message: getApiErrorMessage(
           error,
           'Unable to complete administrator setup. Please try again.',
         ),
-      );
+      });
     }
+  }
+
+  function handleModeChange(next: AcceptAdminInviteMode) {
+    setMode(next);
+    clearSubmitError();
   }
 
   return {
     token,
     mode,
-    setMode,
+    setMode: handleModeChange,
     register,
     errors,
+    submitError,
     isValid,
     isSubmitting: isSubmitting || isAcceptingExisting,
     handleSubmit,

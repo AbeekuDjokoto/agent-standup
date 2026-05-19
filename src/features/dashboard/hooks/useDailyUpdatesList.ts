@@ -1,8 +1,7 @@
 import dayjs from 'dayjs';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useAuthHydration } from '@/hooks/useAuthHydration';
-import { useToast } from '@/hooks';
 import {
   fetchAllDailyActivity,
   fetchMyDailyActivity,
@@ -91,9 +90,6 @@ export function useDailyUpdatesList({
   isAdminView = false,
 }: UseDailyUpdatesListOptions = {}) {
   const hasHydrated = useAuthHydration();
-  const toast = useToast();
-  const toastRef = useRef(toast);
-  toastRef.current = toast;
 
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
@@ -110,6 +106,7 @@ export function useDailyUpdatesList({
   const [summary, setSummary] = useState<DailyActivitySummary | null>(null);
   const [dateFilter, setDateFilter] = useState<DateFilterPreset>('all');
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadDailyUpdates = useCallback(
     async (preset: DateFilterPreset) => {
@@ -130,6 +127,7 @@ export function useDailyUpdatesList({
 
       try {
         setIsLoading(true);
+        setLoadError(null);
         const params = {
           page: 1,
           page_size: 100,
@@ -143,7 +141,9 @@ export function useDailyUpdatesList({
         setDailyUpdates(response.items.map(mapItemToRecord));
         setSummary(response.summary);
       } catch (error) {
-        toastRef.current.error(
+        setDailyUpdates([]);
+        setSummary(null);
+        setLoadError(
           getApiErrorMessage(
             error,
             useAdminEndpoint
@@ -188,6 +188,7 @@ export function useDailyUpdatesList({
     dateFilter,
     setDateFilter,
     isLoading: !isSessionReady || isLoading,
+    loadError,
     reload: () => loadDailyUpdates(dateFilter),
   };
 }

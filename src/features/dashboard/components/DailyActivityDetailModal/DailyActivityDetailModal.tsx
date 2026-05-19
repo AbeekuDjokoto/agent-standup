@@ -9,8 +9,8 @@ import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { updateDailyActivity } from '@/services/activityService';
 import type { DailyActivityItem } from '@/types/activity';
+import { FormAlert } from '@/components/FormAlert';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
-import { useToast } from '@/hooks';
 
 import {
   editDailyActivitySchema,
@@ -57,8 +57,8 @@ export function DailyActivityDetailModal({
   isLoading,
   onActivityUpdated,
 }: DailyActivityDetailModalProps) {
-  const toast = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const {
     register,
@@ -83,10 +83,13 @@ export function DailyActivityDetailModal({
       update_date: dayjs(activity.date).toDate(),
     });
     setIsEditing(false);
+    setSaveError(null);
   }, [activity, reset]);
 
   async function onSubmit(values: EditDailyActivityValues) {
     if (!activity) return;
+
+    setSaveError(null);
 
     try {
       const { daily_activity } = await updateDailyActivity(activity.id, {
@@ -95,11 +98,10 @@ export function DailyActivityDetailModal({
         update_date: dayjs(values.update_date).format('YYYY-MM-DD'),
       });
 
-      toast.success('Daily update saved.');
       onActivityUpdated?.(daily_activity);
       setIsEditing(false);
     } catch (error) {
-      toast.error(
+      setSaveError(
         getApiErrorMessage(
           error,
           'Unable to save daily update. Please try again.',
@@ -110,6 +112,7 @@ export function DailyActivityDetailModal({
 
   function handleClose() {
     setIsEditing(false);
+    setSaveError(null);
     onClose();
   }
 
@@ -154,7 +157,10 @@ export function DailyActivityDetailModal({
                 type="button"
                 variant="primary"
                 className="w-full"
-                onClick={() => setIsEditing(true)}
+                onClick={() => {
+                  setSaveError(null);
+                  setIsEditing(true);
+                }}
               >
                 Edit
               </Button>
@@ -172,6 +178,7 @@ export function DailyActivityDetailModal({
 
         {!isLoading && activity && isEditing ? (
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+            {saveError ? <FormAlert>{saveError}</FormAlert> : null}
             <Input
               label="Applications"
               type="number"
@@ -226,6 +233,7 @@ export function DailyActivityDetailModal({
                       update_date: dayjs(activity.date).toDate(),
                     });
                   }
+                  setSaveError(null);
                   setIsEditing(false);
                 }}
               >

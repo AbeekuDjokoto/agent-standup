@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { useToast } from '@/hooks';
 import { fetchAgentProfile } from '@/services/adminService';
 import { fetchAllDailyActivity } from '@/services/activityService';
 import type { UserPublic } from '@/types/admin';
@@ -40,19 +39,18 @@ function getFilterParams(preset: DateFilterPreset) {
 }
 
 export function useAgentProfileActivity(agentUuid: string | null) {
-  const toast = useToast();
-  const toastRef = useRef(toast);
-  toastRef.current = toast;
   const [agent, setAgent] = useState<UserPublic | null>(null);
   const [updates, setUpdates] = useState<DailyUpdateRecord[]>([]);
   const [summary, setSummary] = useState<DailyActivitySummary | null>(null);
   const [dateFilter, setDateFilter] = useState<DateFilterPreset>('all');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const load = useCallback(
     async (uuid: string, preset: DateFilterPreset) => {
       try {
         setIsLoading(true);
+        setLoadError(null);
         const [profileResponse, activityResponse] = await Promise.all([
           fetchAgentProfile(uuid),
           fetchAllDailyActivity({
@@ -79,7 +77,7 @@ export function useAgentProfileActivity(agentUuid: string | null) {
         );
         setSummary(activityResponse.summary);
       } catch (error) {
-        toastRef.current.error(
+        setLoadError(
           getApiErrorMessage(error, 'Unable to load agent profile right now.'),
         );
         setAgent(null);
@@ -97,6 +95,7 @@ export function useAgentProfileActivity(agentUuid: string | null) {
       setAgent(null);
       setUpdates([]);
       setSummary(null);
+      setLoadError(null);
       return;
     }
 
@@ -129,6 +128,7 @@ export function useAgentProfileActivity(agentUuid: string | null) {
     dateFilter,
     setDateFilter,
     isLoading,
+    loadError,
     reload: () => (agentUuid ? load(agentUuid, dateFilter) : Promise.resolve()),
   };
 }

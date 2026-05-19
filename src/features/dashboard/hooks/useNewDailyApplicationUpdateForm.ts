@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
-import { useAgentIdentity, useToast } from '@/hooks';
+import { useAgentIdentity } from '@/hooks';
 import { createDailyActivity } from '@/services/activityService';
 import { useAuthStore } from '@/stores';
 import { getAuthDisplayName } from '@/utils/auth';
@@ -19,7 +19,6 @@ import {
 
 export function useNewDailyApplicationUpdateForm() {
   const navigate = useNavigate();
-  const toast = useToast();
   const { agentUid, displayName, locationStation } = useAgentIdentity();
   const storeUser = useAuthStore((state) => state.user);
 
@@ -31,6 +30,8 @@ export function useNewDailyApplicationUpdateForm() {
     handleSubmit,
     reset,
     trigger,
+    setError,
+    clearErrors,
     formState: { errors, isSubmitting, isValid },
   } = useForm<
     NewDailyUpdateFormInput,
@@ -65,17 +66,24 @@ export function useNewDailyApplicationUpdateForm() {
   const isWeekendBlocked = isWeekendInTimeZone();
 
   const onSubmit = async (values: NewDailyApplicationUpdateValues) => {
+    clearErrors('root');
+
     const userId = storeUser?.id ?? agentUid;
 
     if (!userId) {
-      toast.error('You must be logged in to submit an update.');
+      setError('root', {
+        type: 'server',
+        message: 'You must be logged in to submit an update.',
+      });
       return;
     }
 
     if (isWeekendInTimeZone()) {
-      toast.error(
-        'Daily updates cannot be submitted on Saturday or Sunday (Ghana time).',
-      );
+      setError('root', {
+        type: 'server',
+        message:
+          'Daily updates cannot be submitted on Saturday or Sunday (Ghana time).',
+      });
       return;
     }
 
@@ -95,12 +103,15 @@ export function useNewDailyApplicationUpdateForm() {
         update_date: dayjs(values.updateDate).format('YYYY-MM-DD'),
       });
 
-      toast.success('Daily update submitted successfully.');
       navigate(ROUTES.user.dashboard.dailyApplicationUpdates);
     } catch (error) {
-      toast.error(
-        getApiErrorMessage(error, 'Unable to submit daily update. Please try again.'),
-      );
+      setError('root', {
+        type: 'server',
+        message: getApiErrorMessage(
+          error,
+          'Unable to submit daily update. Please try again.',
+        ),
+      });
     }
   };
 

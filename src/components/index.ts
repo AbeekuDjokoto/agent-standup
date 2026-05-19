@@ -5,7 +5,7 @@ export * from './Select';
 export * from './InputLabel';
 export * from './IconPreloader';
 export * from './Providers';
-export * from './ToastProvider';
+export * from './FormAlert';
 export * from './Checkbox';
 export * from './Avatar';
 export * from './DateInput';

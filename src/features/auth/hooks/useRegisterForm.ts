@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { useToast } from '@/hooks';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { ROUTES } from '@/utils/route-constants';
 import {
@@ -12,12 +11,13 @@ import {
 import { registerUser } from '@/services/authService';
 
 export function useRegisterForm() {
-  const toast = useToast();
   const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors, isValid, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -31,6 +31,8 @@ export function useRegisterForm() {
   });
 
   async function onSubmit(values: RegisterFormValues) {
+    clearErrors('root');
+
     try {
       await registerUser({
         full_name: values.fullName.trim(),
@@ -39,12 +41,15 @@ export function useRegisterForm() {
         location_station: values.locationStation,
       });
 
-      toast.success('Account created successfully. Please log in.');
       navigate(ROUTES.user.auth.login);
     } catch (error) {
-      toast.error(
-        getApiErrorMessage(error, 'Unable to create account. Please try again.'),
-      );
+      setError('root', {
+        type: 'server',
+        message: getApiErrorMessage(
+          error,
+          'Unable to create account. Please try again.',
+        ),
+      });
     }
   }
 

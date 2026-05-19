@@ -1,5 +1,7 @@
 import { Modal } from '@/components/Modal';
 import { Button } from '@/components/Button';
+import { FormAlert } from '@/components/FormAlert';
+import { FormAlert } from '@/components/FormAlert';
 import { useAgentProfileActivity } from '@/features/dashboard/hooks/useAgentProfileActivity';
 import type { DateFilterPreset } from '@/features/dashboard/hooks/useDailyUpdatesList';
 import { getAuthDisplayName } from '@/utils/auth';
@@ -32,6 +34,7 @@ export function AgentProfileModal({
     dateFilter,
     setDateFilter,
     isLoading,
+    loadError,
   } = useAgentProfileActivity(isOpen ? agentUuid : null);
 
   const displayName = agent ? getAuthDisplayName(agent) : '';
@@ -50,6 +53,8 @@ export function AgentProfileModal({
         {isLoading ? (
           <p className="text-sm text-neutral-grey-500">Loading agent profile...</p>
         ) : null}
+
+        {loadError ? <FormAlert>{loadError}</FormAlert> : null}
 
         {!isLoading && agent ? (
           <>

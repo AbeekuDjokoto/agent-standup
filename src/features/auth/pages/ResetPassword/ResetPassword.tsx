@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/Button';
+import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
 import userLineIcon from '@/assets/svgs/user-line.svg';
 import {
@@ -37,8 +38,15 @@ export const ResetPassword = () => {
 
       <div className="my-4 h-px bg-neutral-grey-100 sm:my-6" />
 
+      {!hasToken && errors.root?.message ? (
+        <FormAlert className="mb-4">{errors.root.message}</FormAlert>
+      ) : null}
+
       {hasToken ? (
         <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
+          {errors.root?.message ? (
+            <FormAlert>{errors.root.message}</FormAlert>
+          ) : null}
           <Input
             type="password"
             label="New password"

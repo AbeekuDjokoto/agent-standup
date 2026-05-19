@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { useToast } from '@/hooks';
 import { resetPassword } from '@/services/authService';
 import { useAuthStore } from '@/stores';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
@@ -13,7 +12,6 @@ import {
 } from '@/features/auth/pages/ResetPassword/resetPasswordSchema';
 
 export function useResetPasswordForm() {
-  const toast = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token')?.trim() ?? '';
@@ -21,6 +19,8 @@ export function useResetPasswordForm() {
   const {
     register,
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors, isValid, isSubmitting },
   } = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -32,8 +32,13 @@ export function useResetPasswordForm() {
   });
 
   async function onSubmit(values: ResetPasswordFormValues) {
+    clearErrors('root');
+
     if (!token) {
-      toast.error('This reset link is invalid or has expired.');
+      setError('root', {
+        type: 'server',
+        message: 'This reset link is invalid or has expired.',
+      });
       return;
     }
 
@@ -44,12 +49,15 @@ export function useResetPasswordForm() {
       });
 
       useAuthStore.getState().reset();
-      toast.success('Your password has been updated. Please log in.');
       navigate(ROUTES.user.auth.login, { replace: true });
     } catch (error) {
-      toast.error(
-        getApiErrorMessage(error, 'Unable to reset password. Please try again.'),
-      );
+      setError('root', {
+        type: 'server',
+        message: getApiErrorMessage(
+          error,
+          'Unable to reset password. Please try again.',
+        ),
+      });
     }
   }
 

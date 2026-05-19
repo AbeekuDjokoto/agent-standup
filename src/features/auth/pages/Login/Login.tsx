@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/Button';
+import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
 import { Checkbox } from '@/components';
 import userLineIcon from '@/assets/svgs/user-line.svg';
@@ -36,6 +37,9 @@ export const Login = () => {
       <div className="my-4 h-px bg-neutral-grey-100 sm:my-6" />
 
       <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
+        {errors.root?.message ? (
+          <FormAlert>{errors.root.message}</FormAlert>
+        ) : null}
         <Input
           label="Email Address"
           type="email"

@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/Button';
+import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
-import { useToast } from '@/hooks';
 import { inviteAdmin } from '@/services/adminService';
 import type { AdminInviteResponse } from '@/types/admin';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
@@ -16,8 +16,8 @@ import {
 } from './adminInviteSchema';
 
 export function AdminInviteSection() {
-  const toast = useToast();
   const [lastInvite, setLastInvite] = useState<AdminInviteResponse | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -31,24 +31,23 @@ export function AdminInviteSection() {
   });
 
   async function onSubmit(values: AdminInviteFormValues) {
+    setSubmitError(null);
+
     try {
       const response = await inviteAdmin({ email: values.email });
       setLastInvite(response);
-      toast.success(
-        response.message || 'Administrator invitation sent successfully.',
-      );
       reset({ email: '' });
     } catch (error) {
       const apiError = error as { status?: number; message?: string };
       if (apiError.status === 409) {
-        toast.error(
+        setSubmitError(
           apiError.message ||
             'This email already belongs to an administrator account.',
         );
         return;
       }
 
-      toast.error(
+      setSubmitError(
         getApiErrorMessage(error, 'Unable to send invitation. Please try again.'),
       );
     }
@@ -89,6 +88,10 @@ export function AdminInviteSection() {
           {isSubmitting ? 'Sending...' : 'Send invite'}
         </Button>
       </form>
+
+      {submitError ? (
+        <FormAlert className="mt-3">{submitError}</FormAlert>
+      ) : null}
 
       {lastInvite ? (
         <p className="mt-4 rounded-lg border border-[#b2ddff] bg-[#eff8ff] px-4 py-3 text-sm text-[#175cd3]">

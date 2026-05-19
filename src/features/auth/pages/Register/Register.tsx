@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/Button';
+import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import userLineIcon from '@/assets/svgs/user-line.svg';
@@ -37,6 +38,9 @@ export const Register = () => {
       <div className="my-4 h-px bg-neutral-grey-100 sm:my-5" />
 
       <form className="space-y-2.5" onSubmit={handleSubmit(onSubmit)}>
+        {errors.root?.message ? (
+          <FormAlert>{errors.root.message}</FormAlert>
+        ) : null}
         <Input
           label="Full Name"
           placeholder="e.g. Abeeku Djokoto"

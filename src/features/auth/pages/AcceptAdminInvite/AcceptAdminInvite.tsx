@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/Button';
+import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import userLineIcon from '@/assets/svgs/user-line.svg';
@@ -85,6 +86,7 @@ export function AcceptAdminInvite() {
     setMode,
     register,
     errors,
+    submitError,
     isValid,
     isSubmitting,
     handleSubmit,
@@ -114,6 +116,10 @@ export function AcceptAdminInvite() {
 
       <ModeToggle mode={mode} onChange={setMode} />
 
+      {submitError && mode === 'existing' ? (
+        <FormAlert className="mt-4">{submitError}</FormAlert>
+      ) : null}
+
       {mode === 'existing' ? (
         <div className="mt-4 space-y-4">
           <p className="text-sm text-neutral-grey-500">
@@ -137,6 +143,10 @@ export function AcceptAdminInvite() {
           className="mt-4 space-y-2.5"
           onSubmit={handleSubmit(onSubmitNewUser)}
         >
+          {errors.root?.message ? (
+            <FormAlert>{errors.root.message}</FormAlert>
+          ) : null}
+          {submitError ? <FormAlert>{submitError}</FormAlert> : null}
           <Input
             label="Full name"
             placeholder="e.g. Abeeku Djokoto"

@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { useToast } from '@/hooks';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import {
   getForgotPasswordSuccessMessage,
@@ -16,7 +15,6 @@ import {
 } from '@/features/auth/pages/ForgotPassword/forgotPasswordSchema';
 
 export function useForgotPasswordForm() {
-  const toast = useToast();
   const navigate = useNavigate();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -24,6 +22,8 @@ export function useForgotPasswordForm() {
   const {
     register,
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors, isValid, isSubmitting },
   } = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -34,6 +34,8 @@ export function useForgotPasswordForm() {
   });
 
   async function onSubmit(values: ForgotPasswordFormValues) {
+    clearErrors('root');
+
     try {
       const response = await requestPasswordReset({
         email: values.email.trim(),
@@ -42,18 +44,20 @@ export function useForgotPasswordForm() {
       const message = getForgotPasswordSuccessMessage(response);
 
       if (response.reset_url) {
-        toast.success(message);
         navigate(getResetPasswordPathFromUrl(response.reset_url));
         return;
       }
 
       setSuccessMessage(message);
       setIsSubmitted(true);
-      toast.success(message);
     } catch (error) {
-      toast.error(
-        getApiErrorMessage(error, 'Unable to send reset instructions. Please try again.'),
-      );
+      setError('root', {
+        type: 'server',
+        message: getApiErrorMessage(
+          error,
+          'Unable to send reset instructions. Please try again.',
+        ),
+      });
     }
   }
 

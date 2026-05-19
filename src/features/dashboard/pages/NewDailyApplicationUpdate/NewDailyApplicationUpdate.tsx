@@ -3,6 +3,8 @@ import { Controller } from 'react-hook-form';
 
 import { NavigationBar } from '@/features/dashboard/components/Navigation';
 import { Button } from '@/components/Button';
+import { FormAlert } from '@/components/FormAlert';
+import { FormAlert } from '@/components/FormAlert';
 import { DateInput } from '@/components/DateInput/DateInput';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
@@ -60,6 +62,9 @@ export const NewDailyApplicationUpdate = () => {
           ) : null}
 
           <form className="grid gap-4 md:grid-cols-2" onSubmit={onFormSubmit}>
+            {errors.root?.message ? (
+              <FormAlert className="md:col-span-2">{errors.root.message}</FormAlert>
+            ) : null}
             <Input
               label="Agent Full Name"
               placeholder="e.g. Abeeku Djokoto"
