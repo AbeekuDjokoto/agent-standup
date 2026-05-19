@@ -1,14 +1,15 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
-import { ROUTES } from '@/utils/route-constants';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import {
-  registerSchema,
   type RegisterFormValues,
+  registerSchema,
 } from '@/features/auth/pages/Register/registerSchema';
 import { registerUser } from '@/services/authService';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { ROUTES } from '@/utils/route-constants';
 
 export function useRegisterForm() {
   const navigate = useNavigate();

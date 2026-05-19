@@ -1,21 +1,24 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { FormAlert } from '@/components/FormAlert';
 import { AgentProfileModal } from '@/features/dashboard/components/AgentProfileModal';
 import { DailyActivityDetailModal } from '@/features/dashboard/components/DailyActivityDetailModal';
 import { DailyUpdateCard } from '@/features/dashboard/components/DailyUpdateCard';
 import { DailyUpdatesSummary } from '@/features/dashboard/components/DailyUpdatesSummary';
 import {
-  useDailyUpdatesList,
   type DateFilterPreset,
+  useDailyUpdatesList,
 } from '@/features/dashboard/hooks/useDailyUpdatesList';
-import { FormAlert } from '@/components/FormAlert';
 import { fetchDailyActivityById } from '@/services/activityService';
 import type { DailyActivityItem } from '@/types/activity';
-import { ROUTES } from '@/utils/route-constants';
 import { isWeekendInTimeZone } from '@/utils/businessDays';
-import { generateAndDownloadCsv, type CsvHeader } from '@/utils/generateAndDownloadCsv';
+import {
+  type CsvHeader,
+  generateAndDownloadCsv,
+} from '@/utils/generateAndDownloadCsv';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
-import { useState } from 'react';
+import { ROUTES } from '@/utils/route-constants';
 
 const statusStyles = {
   Submitted: 'bg-[#eff8ff] text-[#175cd3] ring-[#b2ddff]',
@@ -61,11 +64,12 @@ export function DailyUpdatesPanel({
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
-  const [activityDetail, setActivityDetail] = useState<DailyActivityItem | null>(
+  const [activityDetail, setActivityDetail] =
+    useState<DailyActivityItem | null>(null);
+  const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
+  const [selectedAgentUuid, setSelectedAgentUuid] = useState<string | null>(
     null,
   );
-  const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
-  const [selectedAgentUuid, setSelectedAgentUuid] = useState<string | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [exportHint, setExportHint] = useState<string | null>(null);
 
@@ -223,7 +227,11 @@ export function DailyUpdatesPanel({
                 }}
                 className={filterButtonClass(dateFilter === preset)}
               >
-                {preset === 'today' ? 'Today' : preset === 'week' ? 'This Week' : 'All'}
+                {preset === 'today'
+                  ? 'Today'
+                  : preset === 'week'
+                    ? 'This Week'
+                    : 'All'}
               </button>
             ))}
             <button
@@ -244,29 +252,31 @@ export function DailyUpdatesPanel({
 
         <div className="space-y-2.5 p-3 md:hidden">
           {isLoading ? (
-            <p className="py-6 text-sm text-neutral-grey-500">Loading daily updates...</p>
+            <p className="py-6 text-sm text-neutral-grey-500">
+              Loading daily updates...
+            </p>
           ) : null}
           {!isLoading && dailyUpdates.length === 0 ? (
             <p className="py-6 text-sm text-neutral-grey-500">{emptyMessage}</p>
           ) : null}
           {!isLoading &&
             dailyUpdates.map((item) => (
-                <DailyUpdateCard
-                  key={item.id}
-                  agentName={item.agentName}
-                  location={item.location}
-                  applicationsCount={item.applicationsCount}
-                  loanAmount={item.loanAmount}
-                  status={item.status}
-                  statusClassName={statusStyles[item.status]}
-                  date={item.date}
-                  onClick={() => void handleRowClick(item.id)}
-                  onViewAgent={
-                    isAdmin && item.agentUuid
-                      ? () => handleAgentClick(item.agentUuid!)
-                      : undefined
-                  }
-                />
+              <DailyUpdateCard
+                key={item.id}
+                agentName={item.agentName}
+                location={item.location}
+                applicationsCount={item.applicationsCount}
+                loanAmount={item.loanAmount}
+                status={item.status}
+                statusClassName={statusStyles[item.status]}
+                date={item.date}
+                onClick={() => void handleRowClick(item.id)}
+                onViewAgent={
+                  isAdmin && item.agentUuid
+                    ? () => handleAgentClick(item.agentUuid!)
+                    : undefined
+                }
+              />
             ))}
         </div>
 

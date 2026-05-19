@@ -1,5 +1,6 @@
-import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
+
+import dayjs from 'dayjs';
 
 import { useAuthHydration } from '@/hooks/useAuthHydration';
 import {
@@ -97,8 +98,7 @@ export function useDailyUpdatesList({
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const isSessionReady =
-    hasHydrated &&
-    isAuthSessionValid({ token, expiresAt, isAuthenticated });
+    hasHydrated && isAuthSessionValid({ token, expiresAt, isAuthenticated });
   const rolesKey = resolveUserRoles(user, token).join(',');
   const isAdmin = isAdminView || isAdminSession(user, token);
 
@@ -121,7 +121,8 @@ export function useDailyUpdatesList({
         return;
       }
 
-      const { user: sessionUser, token: sessionToken } = useAuthStore.getState();
+      const { user: sessionUser, token: sessionToken } =
+        useAuthStore.getState();
       const useAdminEndpoint =
         isAdminView || isAdminSession(sessionUser, sessionToken);
 

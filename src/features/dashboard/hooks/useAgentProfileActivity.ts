@@ -1,13 +1,17 @@
-import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 
-import { fetchAgentProfile } from '@/services/adminService';
+import dayjs from 'dayjs';
+
 import { fetchAllDailyActivity } from '@/services/activityService';
-import type { UserPublic } from '@/types/admin';
+import { fetchAgentProfile } from '@/services/adminService';
 import type { DailyActivitySummary } from '@/types/activity';
+import type { UserPublic } from '@/types/admin';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
-import type { DailyUpdateRecord, DateFilterPreset } from './useDailyUpdatesList';
+import type {
+  DailyUpdateRecord,
+  DateFilterPreset,
+} from './useDailyUpdatesList';
 
 function formatActivityDate(value: string | null | undefined): string {
   if (!value) return '-';
@@ -46,49 +50,46 @@ export function useAgentProfileActivity(agentUuid: string | null) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const load = useCallback(
-    async (uuid: string, preset: DateFilterPreset) => {
-      try {
-        setIsLoading(true);
-        setLoadError(null);
-        const [profileResponse, activityResponse] = await Promise.all([
-          fetchAgentProfile(uuid),
-          fetchAllDailyActivity({
-            agent_uuid: uuid,
-            page: 1,
-            page_size: 100,
-            ...getFilterParams(preset),
-          }),
-        ]);
+  const load = useCallback(async (uuid: string, preset: DateFilterPreset) => {
+    try {
+      setIsLoading(true);
+      setLoadError(null);
+      const [profileResponse, activityResponse] = await Promise.all([
+        fetchAgentProfile(uuid),
+        fetchAllDailyActivity({
+          agent_uuid: uuid,
+          page: 1,
+          page_size: 100,
+          ...getFilterParams(preset),
+        }),
+      ]);
 
-        setAgent(profileResponse.user);
-        setUpdates(
-          activityResponse.items.map((item) => ({
-            id: item.id,
-            agentUuid: item.agent_uuid,
-            agentName: item.agent_full_name,
-            plan: 'Daily Update',
-            location: item.location,
-            applicationsCount: item.applications,
-            loanAmount: item.total_amount,
-            status: 'Submitted' as const,
-            date: formatActivityDate(item.date || item.submitted),
-          })),
-        );
-        setSummary(activityResponse.summary);
-      } catch (error) {
-        setLoadError(
-          getApiErrorMessage(error, 'Unable to load agent profile right now.'),
-        );
-        setAgent(null);
-        setUpdates([]);
-        setSummary(null);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
+      setAgent(profileResponse.user);
+      setUpdates(
+        activityResponse.items.map((item) => ({
+          id: item.id,
+          agentUuid: item.agent_uuid,
+          agentName: item.agent_full_name,
+          plan: 'Daily Update',
+          location: item.location,
+          applicationsCount: item.applications,
+          loanAmount: item.total_amount,
+          status: 'Submitted' as const,
+          date: formatActivityDate(item.date || item.submitted),
+        })),
+      );
+      setSummary(activityResponse.summary);
+    } catch (error) {
+      setLoadError(
+        getApiErrorMessage(error, 'Unable to load agent profile right now.'),
+      );
+      setAgent(null);
+      setUpdates([]);
+      setSummary(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!agentUuid) {

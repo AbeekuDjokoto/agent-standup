@@ -1,7 +1,8 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
   acceptAdminInviteNewUserSchema,
@@ -47,7 +48,9 @@ export function useAcceptAdminInviteForm() {
     clearErrors('root');
   }
 
-  function completeSession(response: Awaited<ReturnType<typeof acceptAdminInvite>>) {
+  function completeSession(
+    response: Awaited<ReturnType<typeof acceptAdminInvite>>,
+  ) {
     const user = authenticateFromLoginResponse(response);
     const roles = getUserRoles(user);
     navigate(getPostLoginPath(roles), { replace: true });

@@ -1,8 +1,9 @@
 import type { RouteObject } from 'react-router-dom';
 import { Navigate, useLocation } from 'react-router-dom';
 
-import { AcceptAdminInvite, ForgotPassword, Login, Register } from '../pages';
 import { ROUTES } from '@/utils/route-constants';
+
+import { AcceptAdminInvite, ForgotPassword, Login, Register } from '../pages';
 
 function LegacyAuthResetPasswordRedirect() {
   const { search } = useLocation();

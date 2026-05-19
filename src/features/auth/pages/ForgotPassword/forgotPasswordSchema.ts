@@ -1,5 +1,6 @@
-import { getRequiredEmailSchema } from '@/utils/schemas';
 import { z } from 'zod';
+
+import { getRequiredEmailSchema } from '@/utils/schemas';
 
 export const forgotPasswordSchema = z.object({
   email: getRequiredEmailSchema('Email address'),

@@ -1,8 +1,7 @@
 import React from 'react';
-import { Text } from '../Text';
+
 import { cn } from '../../libs/cn';
-
-
+import { Text } from '../Text';
 
 type Props = {
   children: React.ReactNode;

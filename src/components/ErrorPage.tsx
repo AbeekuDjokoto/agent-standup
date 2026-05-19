@@ -2,7 +2,6 @@ import React from 'react';
 import { useRouteError } from 'react-router-dom';
 
 import { cn } from '../libs/cn';
-
 import { ErrorText } from './Text';
 type Props = Readonly<{
   className?: string;

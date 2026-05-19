@@ -1,7 +1,6 @@
-import { Modal } from '@/components/Modal';
 import { Button } from '@/components/Button';
 import { FormAlert } from '@/components/FormAlert';
-import { FormAlert } from '@/components/FormAlert';
+import { Modal } from '@/components/Modal';
 import { useAgentProfileActivity } from '@/features/dashboard/hooks/useAgentProfileActivity';
 import type { DateFilterPreset } from '@/features/dashboard/hooks/useDailyUpdatesList';
 import { getAuthDisplayName } from '@/utils/auth';
@@ -51,7 +50,9 @@ export function AgentProfileModal({
     >
       <div className="flex flex-col gap-6 p-6">
         {isLoading ? (
-          <p className="text-sm text-neutral-grey-500">Loading agent profile...</p>
+          <p className="text-sm text-neutral-grey-500">
+            Loading agent profile...
+          </p>
         ) : null}
 
         {loadError ? <FormAlert>{loadError}</FormAlert> : null}
@@ -62,9 +63,13 @@ export function AgentProfileModal({
               <p className="text-lg font-semibold text-neutral-grey-600">
                 {displayName}
               </p>
-              <p className="mt-1 text-sm text-neutral-grey-500">{agent.email}</p>
+              <p className="mt-1 text-sm text-neutral-grey-500">
+                {agent.email}
+              </p>
               <p className="mt-2 text-sm text-neutral-grey-600">
-                <span className="font-medium text-neutral-grey-500">Station: </span>
+                <span className="font-medium text-neutral-grey-500">
+                  Station:{' '}
+                </span>
                 {agent.location_station || '-'}
               </p>
             </div>
@@ -87,20 +92,22 @@ export function AgentProfileModal({
 
             <div>
               <div className="mb-3 flex flex-wrap gap-2">
-                {(['today', 'week', 'all'] as DateFilterPreset[]).map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => setDateFilter(preset)}
-                    className={filterButtonClass(dateFilter === preset)}
-                  >
-                    {preset === 'today'
-                      ? 'Today'
-                      : preset === 'week'
-                        ? 'This Week'
-                        : 'All'}
-                  </button>
-                ))}
+                {(['today', 'week', 'all'] as DateFilterPreset[]).map(
+                  (preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setDateFilter(preset)}
+                      className={filterButtonClass(dateFilter === preset)}
+                    >
+                      {preset === 'today'
+                        ? 'Today'
+                        : preset === 'week'
+                          ? 'This Week'
+                          : 'All'}
+                    </button>
+                  ),
+                )}
               </div>
 
               <h3 className="mb-2 text-sm font-semibold text-neutral-grey-600">
@@ -146,7 +153,12 @@ export function AgentProfileModal({
           </p>
         ) : null}
 
-        <Button type="button" variant="outline" className="w-full" onClick={onClose}>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={onClose}
+        >
           Close
         </Button>
       </div>

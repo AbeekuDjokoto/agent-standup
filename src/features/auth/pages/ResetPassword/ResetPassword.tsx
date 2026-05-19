@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 
+import userLineIcon from '@/assets/svgs/user-line.svg';
 import { Button } from '@/components/Button';
 import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
-import userLineIcon from '@/assets/svgs/user-line.svg';
 import {
   authCardClassName,
   authCardHeaderClassName,
@@ -26,7 +26,12 @@ export const ResetPassword = () => {
     <section className={authCardClassName}>
       <div className={authCardHeaderClassName}>
         <div className="grid h-14 w-14 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] sm:h-16 sm:w-16">
-          <img src={userLineIcon} alt="" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
+          <img
+            src={userLineIcon}
+            alt=""
+            className="h-7 w-7 sm:h-8 sm:w-8"
+            aria-hidden
+          />
         </div>
         <h1 className={authCardTitleClassName}>Set a new password</h1>
         <p className={authCardSubtitleClassName}>
@@ -93,7 +98,10 @@ export const ResetPassword = () => {
       )}
 
       <p className="mt-4 text-center text-sm text-neutral-grey-500 sm:mt-6">
-        <Link to={ROUTES.user.auth.login} className="text-brand-primary underline">
+        <Link
+          to={ROUTES.user.auth.login}
+          className="text-brand-primary underline"
+        >
           Back to login
         </Link>
       </p>

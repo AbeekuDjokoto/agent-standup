@@ -1,7 +1,4 @@
-import axios, {
-  AxiosError,
-  InternalAxiosRequestConfig,
-} from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 import { useAuthStore } from '@/stores';
 import { ENV_VARS } from '@/utils/constants';
@@ -42,8 +39,7 @@ function errorHandler(error: AxiosError) {
   let { status } = error.response || {};
   status = error.code === 'ERR_CANCELED' ? CANCELLED_STATUS_CODE : status;
 
-  const fallback =
-    error.message || 'Sorry, an unexpected error occurred.';
+  const fallback = error.message || 'Sorry, an unexpected error occurred.';
   const responseData = error.response?.data;
   const message = getResponseErrorMessage(responseData, fallback);
 
@@ -56,21 +52,23 @@ function errorHandler(error: AxiosError) {
   };
 }
 
-instance.interceptors.request.use(async (request: InternalAxiosRequestConfig) => {
-  const requestUrl = request.url ?? '';
+instance.interceptors.request.use(
+  async (request: InternalAxiosRequestConfig) => {
+    const requestUrl = request.url ?? '';
 
-  if (!isCookieAuthRequestUrl(requestUrl) && shouldProactivelyRefresh()) {
-    await tryRefreshSession();
-  }
+    if (!isCookieAuthRequestUrl(requestUrl) && shouldProactivelyRefresh()) {
+      await tryRefreshSession();
+    }
 
-  const { token, isSessionValid } = useAuthStore.getState();
+    const { token, isSessionValid } = useAuthStore.getState();
 
-  if (token && isSessionValid() && !isCookieAuthRequestUrl(requestUrl)) {
-    request.headers.Authorization = `Bearer ${token}`;
-  }
+    if (token && isSessionValid() && !isCookieAuthRequestUrl(requestUrl)) {
+      request.headers.Authorization = `Bearer ${token}`;
+    }
 
-  return request;
-});
+    return request;
+  },
+);
 
 instance.interceptors.response.use(
   (response) => {

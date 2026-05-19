@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
-import { ROUTES } from '@/utils/route-constants';
 import { logoutUser } from '@/utils/logout';
+import { ROUTES } from '@/utils/route-constants';
 
 export function useLogout() {
   const navigate = useNavigate();

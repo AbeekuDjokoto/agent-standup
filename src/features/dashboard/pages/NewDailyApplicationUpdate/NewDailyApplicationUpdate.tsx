@@ -1,20 +1,19 @@
-import { Link, useNavigate } from 'react-router-dom';
 import { Controller } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { NavigationBar } from '@/features/dashboard/components/Navigation';
 import { Button } from '@/components/Button';
-import { FormAlert } from '@/components/FormAlert';
-import { FormAlert } from '@/components/FormAlert';
 import { DateInput } from '@/components/DateInput/DateInput';
+import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { LOCATION_OPTIONS } from '@/data/locationOptions';
-import { ROUTES } from '@/utils/route-constants';
+import { NavigationBar } from '@/features/dashboard/components/Navigation';
 import {
   dashboardMainClassName,
   dashboardPageClassName,
 } from '@/features/dashboard/dashboardPageStyles';
 import { useNewDailyApplicationUpdateForm } from '@/features/dashboard/hooks';
+import { ROUTES } from '@/utils/route-constants';
 
 export const NewDailyApplicationUpdate = () => {
   const navigate = useNavigate();
@@ -35,7 +34,9 @@ export const NewDailyApplicationUpdate = () => {
         <section className="rounded-xl bg-white p-4 sm:p-6">
           <button
             type="button"
-            onClick={() => navigate(ROUTES.user.dashboard.dailyApplicationUpdates)}
+            onClick={() =>
+              navigate(ROUTES.user.dashboard.dailyApplicationUpdates)
+            }
             className="mb-5 inline-flex items-center gap-2 rounded-lg border border-neutral-grey-200 px-3 py-2 text-sm font-medium text-neutral-grey-600 transition hover:bg-neutral-grey-100"
           >
             <span aria-hidden="true">←</span>
@@ -47,7 +48,8 @@ export const NewDailyApplicationUpdate = () => {
               New Daily Update
             </h1>
             <p className="text-sm text-neutral-grey-500">
-              Capture today&apos;s application performance and commission details.
+              Capture today&apos;s application performance and commission
+              details.
             </p>
           </div>
 
@@ -56,14 +58,16 @@ export const NewDailyApplicationUpdate = () => {
               className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"
               role="status"
             >
-              New daily updates are only available Monday–Friday (Ghana time). Please
-              come back on the next business day.
+              New daily updates are only available Monday–Friday (Ghana time).
+              Please come back on the next business day.
             </div>
           ) : null}
 
           <form className="grid gap-4 md:grid-cols-2" onSubmit={onFormSubmit}>
             {errors.root?.message ? (
-              <FormAlert className="md:col-span-2">{errors.root.message}</FormAlert>
+              <FormAlert className="md:col-span-2">
+                {errors.root.message}
+              </FormAlert>
             ) : null}
             <Input
               label="Agent Full Name"

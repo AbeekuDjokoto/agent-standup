@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 
+import userLineIcon from '@/assets/svgs/user-line.svg';
 import { Button } from '@/components/Button';
 import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
-import userLineIcon from '@/assets/svgs/user-line.svg';
 import { LOCATION_OPTIONS } from '@/data/locationOptions';
 import {
   authCardClassName,
@@ -13,8 +13,8 @@ import {
   authCardTitleClassName,
 } from '@/features/auth/authCardStyles';
 import { useAcceptAdminInviteForm } from '@/features/auth/hooks/useAcceptAdminInviteForm';
-import { ROUTES } from '@/utils/route-constants';
 import { cn } from '@/libs/cn';
+import { ROUTES } from '@/utils/route-constants';
 
 function ModeToggle({
   mode,
@@ -58,7 +58,12 @@ function InvalidInviteLink() {
     <section className={authCardClassName}>
       <div className={authCardHeaderClassName}>
         <div className="grid h-14 w-14 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] sm:h-16 sm:w-16">
-          <img src={userLineIcon} alt="" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
+          <img
+            src={userLineIcon}
+            alt=""
+            className="h-7 w-7 sm:h-8 sm:w-8"
+            aria-hidden
+          />
         </div>
         <h1 className={authCardTitleClassName}>Invalid invitation link</h1>
         <p className={authCardSubtitleClassName}>
@@ -102,7 +107,12 @@ export function AcceptAdminInvite() {
     <section className={authCardClassName}>
       <div className={authCardHeaderClassName}>
         <div className="grid h-14 w-14 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] sm:h-16 sm:w-16">
-          <img src={userLineIcon} alt="" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
+          <img
+            src={userLineIcon}
+            alt=""
+            className="h-7 w-7 sm:h-8 sm:w-8"
+            aria-hidden
+          />
         </div>
         <h1 className={authCardTitleClassName}>Accept admin invitation</h1>
         <p className={authCardSubtitleClassName}>
@@ -123,8 +133,8 @@ export function AcceptAdminInvite() {
       {mode === 'existing' ? (
         <div className="mt-4 space-y-4">
           <p className="text-sm text-neutral-grey-500">
-            Use the email address that received this invitation. Existing sessions
-            will be signed out when you accept.
+            Use the email address that received this invitation. Existing
+            sessions will be signed out when you accept.
           </p>
           <Button
             type="button"
@@ -177,8 +187,8 @@ export function AcceptAdminInvite() {
             {...register('password')}
           />
           <p className="text-xs leading-4 text-neutral-grey-500">
-            Use at least 12 characters with uppercase, lowercase, a number, and a
-            special character.
+            Use at least 12 characters with uppercase, lowercase, a number, and
+            a special character.
           </p>
 
           <Button
@@ -195,7 +205,10 @@ export function AcceptAdminInvite() {
       )}
 
       <p className="mt-4 text-center text-sm text-neutral-grey-500 sm:mt-5">
-        <Link to={ROUTES.user.auth.login} className="text-brand-primary underline">
+        <Link
+          to={ROUTES.user.auth.login}
+          className="text-brand-primary underline"
+        >
           Back to login
         </Link>
       </p>

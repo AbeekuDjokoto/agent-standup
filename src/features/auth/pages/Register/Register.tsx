@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
 
+import userLineIcon from '@/assets/svgs/user-line.svg';
 import { Button } from '@/components/Button';
 import { FormAlert } from '@/components/FormAlert';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
-import userLineIcon from '@/assets/svgs/user-line.svg';
 import { LOCATION_OPTIONS } from '@/data/locationOptions';
-import { ROUTES } from '@/utils/route-constants';
 import {
   authCardClassName,
   authCardHeaderClassName,
@@ -14,6 +13,7 @@ import {
   authCardTitleClassName,
 } from '@/features/auth/authCardStyles';
 import { useRegisterForm } from '@/features/auth/hooks';
+import { ROUTES } from '@/utils/route-constants';
 
 export const Register = () => {
   const {

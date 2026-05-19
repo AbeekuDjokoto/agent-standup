@@ -1,18 +1,19 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import {
+  type ForgotPasswordFormValues,
+  forgotPasswordSchema,
+} from '@/features/auth/pages/ForgotPassword/forgotPasswordSchema';
+import { requestPasswordReset } from '@/services/authService';
 import {
   getForgotPasswordSuccessMessage,
   getResetPasswordPathFromUrl,
 } from '@/utils/auth';
-import { requestPasswordReset } from '@/services/authService';
-import {
-  forgotPasswordSchema,
-  type ForgotPasswordFormValues,
-} from '@/features/auth/pages/ForgotPassword/forgotPasswordSchema';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 export function useForgotPasswordForm() {
   const navigate = useNavigate();

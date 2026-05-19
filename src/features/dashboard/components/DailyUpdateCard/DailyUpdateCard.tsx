@@ -88,7 +88,9 @@ export function DailyUpdateCard({
           <p className="text-[10px] font-medium uppercase tracking-wide text-neutral-grey-500">
             Date
           </p>
-          <p className="mt-1 text-sm font-semibold text-neutral-grey-600">{date}</p>
+          <p className="mt-1 text-sm font-semibold text-neutral-grey-600">
+            {date}
+          </p>
         </div>
       </div>
     </div>

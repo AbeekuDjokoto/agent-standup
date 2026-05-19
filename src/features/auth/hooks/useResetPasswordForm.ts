@@ -1,15 +1,16 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import {
+  type ResetPasswordFormValues,
+  resetPasswordSchema,
+} from '@/features/auth/pages/ResetPassword/resetPasswordSchema';
 import { resetPassword } from '@/services/authService';
 import { useAuthStore } from '@/stores';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { ROUTES } from '@/utils/route-constants';
-import {
-  resetPasswordSchema,
-  type ResetPasswordFormValues,
-} from '@/features/auth/pages/ResetPassword/resetPasswordSchema';
 
 export function useResetPasswordForm() {
   const navigate = useNavigate();

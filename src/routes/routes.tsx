@@ -1,11 +1,13 @@
 import React from 'react';
-import { Navigate, Outlet, type RouteObject } from 'react-router-dom';
-import { AuthLayout } from '../layout/AuthLayout';
-import { ProtectedLayout } from '../layout/ProtectedLayout';
+import { Navigate, type RouteObject } from 'react-router-dom';
+
+import { ROUTES } from '@/utils/route-constants';
+
 import ErrorPage from '../components/ErrorPage';
 import { userAuthRoutes } from '../features/auth/routes/routes';
 import { userDashboaudRoutes } from '../features/dashboard/routes/routes';
-import { ROUTES } from '@/utils/route-constants';
+import { AuthLayout } from '../layout/AuthLayout';
+import { ProtectedLayout } from '../layout/ProtectedLayout';
 import { ResetPasswordRedirect } from './ResetPasswordRedirect';
 
 export const routes: RouteObject[] = [

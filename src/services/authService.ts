@@ -7,11 +7,11 @@ import type {
   LoginApiPayload,
   LoginApiResponse,
   MeApiResponse,
-  UpdateMeApiPayload,
   RegisterApiPayload,
   RegisterApiResponse,
   ResetPasswordApiPayload,
   ResetPasswordApiResponse,
+  UpdateMeApiPayload,
 } from '@/types/auth';
 
 export async function registerUser(
@@ -20,8 +20,13 @@ export async function registerUser(
   return axiosClient.post('/auth/register', payload);
 }
 
-export async function loginUser(payload: LoginApiPayload): Promise<LoginApiResponse> {
-  const data = (await axiosClient.post('/auth/login', payload)) as LoginApiResponse;
+export async function loginUser(
+  payload: LoginApiPayload,
+): Promise<LoginApiResponse> {
+  const data = (await axiosClient.post(
+    '/auth/login',
+    payload,
+  )) as LoginApiResponse;
 
   if (!data?.access_token || !data?.user) {
     throw new Error('Login failed. No access token was returned.');

@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NuqsAdapter } from 'nuqs/adapters/react';
 
-import { useTabRestorationDetection } from '@/hooks/useTabRestorationDetection';
 import { AuthProvider } from '@/context/authContext';
+import { useTabRestorationDetection } from '@/hooks/useTabRestorationDetection';
 
 const queryClient = new QueryClient();
 

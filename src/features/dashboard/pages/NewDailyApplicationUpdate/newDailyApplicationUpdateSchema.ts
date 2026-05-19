@@ -1,9 +1,10 @@
+import { z } from 'zod';
+
 import {
   getNumericStringSchema,
   getRequiredDateSchema,
   getRequiredStringSchema,
 } from '@/utils/schemas';
-import { z } from 'zod';
 
 export const newDailyApplicationUpdateSchema = z.object({
   fullName: getRequiredStringSchema('Agent full name'),

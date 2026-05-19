@@ -1,7 +1,11 @@
 import { Navigate } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores';
-import { getPostLoginPath, isAdminSession, resolveUserRoles } from '@/utils/auth';
+import {
+  getPostLoginPath,
+  isAdminSession,
+  resolveUserRoles,
+} from '@/utils/auth';
 
 type AdminOnlyRouteProps = {
   children: React.ReactNode;

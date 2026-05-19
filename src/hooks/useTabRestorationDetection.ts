@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-import { useAuthStore } from '@/stores/auth';
 import { useUserIdStore } from '@/stores';
+import { useAuthStore } from '@/stores/auth';
 
 /**
  * Hook to detect when a tab is restored (e.g., via Cmd+Shift+T)

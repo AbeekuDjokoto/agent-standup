@@ -1,9 +1,9 @@
 import React from 'react';
-import { cn } from '../../libs/cn';
-import { InputLabel } from '../InputLabel/InputLabel';
-import { Icon } from '../../libs/icon';
-import { ErrorText } from '../Text';
 
+import { cn } from '../../libs/cn';
+import { Icon } from '../../libs/icon';
+import { InputLabel } from '../InputLabel/InputLabel';
+import { ErrorText } from '../Text';
 
 type Props = Readonly<{
   [other: string]: any;
@@ -73,7 +73,10 @@ export const Input = React.forwardRef(
     );
 
     function focusOnInput() {
-      const field = wrapperRef.current?.querySelector('input, textarea');
+      const field = wrapperRef.current?.querySelector('input, textarea') as
+        | HTMLInputElement
+        | HTMLTextAreaElement
+        | null;
       if (!field || field === document.activeElement) return;
       field.focus();
     }
@@ -96,7 +99,10 @@ export const Input = React.forwardRef(
       onFocusProp?.(e);
       if (window.innerWidth < 768) {
         window.setTimeout(() => {
-          e.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          e.currentTarget.scrollIntoView({
+            block: 'center',
+            behavior: 'smooth',
+          });
         }, 300);
       }
     }
@@ -108,10 +114,7 @@ export const Input = React.forwardRef(
 
     return (
       /* WRAPPER */
-      <div
-        ref={wrapperRef}
-        className={cn('wrapper min-w-0', className)}
-      >
+      <div ref={wrapperRef} className={cn('wrapper min-w-0', className)}>
         {/* LABEL */}
         {label ? (
           <InputLabel

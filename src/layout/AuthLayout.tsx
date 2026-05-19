@@ -1,10 +1,10 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
+import heroImage from '@/assets/images/hero-image.png';
 import { useSessionBootstrap } from '@/hooks/useSessionBootstrap';
 import { useAuthStore } from '@/stores';
 import { getPostLoginPath, getUserRoles } from '@/utils/auth';
 import { ROUTES } from '@/utils/route-constants';
-import heroImage from '@/assets/images/hero-image.png';
 
 export const AuthLayout = () => {
   const { isReady, sessionValid } = useSessionBootstrap();

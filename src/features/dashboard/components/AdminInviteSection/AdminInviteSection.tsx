@@ -1,7 +1,8 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import dayjs from 'dayjs';
 
 import { Button } from '@/components/Button';
 import { FormAlert } from '@/components/FormAlert';
@@ -11,12 +12,14 @@ import type { AdminInviteResponse } from '@/types/admin';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import {
-  adminInviteSchema,
   type AdminInviteFormValues,
+  adminInviteSchema,
 } from './adminInviteSchema';
 
 export function AdminInviteSection() {
-  const [lastInvite, setLastInvite] = useState<AdminInviteResponse | null>(null);
+  const [lastInvite, setLastInvite] = useState<AdminInviteResponse | null>(
+    null,
+  );
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
@@ -48,7 +51,10 @@ export function AdminInviteSection() {
       }
 
       setSubmitError(
-        getApiErrorMessage(error, 'Unable to send invitation. Please try again.'),
+        getApiErrorMessage(
+          error,
+          'Unable to send invitation. Please try again.',
+        ),
       );
     }
   }
@@ -60,8 +66,8 @@ export function AdminInviteSection() {
           Invite administrator
         </h2>
         <p className="mt-1 break-words text-sm text-neutral-grey-500">
-          Send an email invitation to grant admin access. Prior unconsumed invites
-          for the same address are replaced.
+          Send an email invitation to grant admin access. Prior unconsumed
+          invites for the same address are replaced.
         </p>
       </div>
 

@@ -17,8 +17,7 @@ const buttonClasses = cva(
           'bg-brand-secondary-blue text-white hover:bg-[#0b2560] focus:bg-[#0b2560] disabled:bg-[#7a91bf]',
         outline:
           'border border-neutral-grey-100 bg-white text-neutral-grey-500 hover:bg-[#f8f8f8] hover:border-neutral-grey-200 disabled:text-[#D1D5DB] disabled:border-neutral-grey-100 disabled:bg-transparent',
-        auth:
-          'rounded-full border border-white/15 bg-brand-primary text-white shadow-[0px_1px_2px_0px_rgba(14,18,27,0.24),0px_0px_0px_1px_#fc8e00] hover:bg-[#e98000] focus:bg-[#e98000]',
+        auth: 'rounded-full border border-white/15 bg-brand-primary text-white shadow-[0px_1px_2px_0px_rgba(14,18,27,0.24),0px_0px_0px_1px_#fc8e00] hover:bg-[#e98000] focus:bg-[#e98000]',
         google:
           'rounded-full border border-neutral-grey-200 bg-white text-neutral-grey-600 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] hover:bg-neutral-grey-100',
         danger:

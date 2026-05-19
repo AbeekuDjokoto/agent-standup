@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text } from './Text';
+
 import { cn } from '../../libs/cn';
 import { Icon } from '../../libs/icon';
+import { Text } from './Text';
 
 type Props = Readonly<{
   error?: string | { message: string } | boolean;

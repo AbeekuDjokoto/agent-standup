@@ -5,9 +5,7 @@ import { getAuthDisplayName, isAuthSessionValid } from '@/utils/auth';
 export function useAgentIdentity() {
   const { currentUser } = useAuth();
   const storeUser = useAuthStore((state) => state.user);
-  const isApiAuthenticated = useAuthStore((state) =>
-    isAuthSessionValid(state),
-  );
+  const isApiAuthenticated = useAuthStore((state) => isAuthSessionValid(state));
 
   const agentUid = currentUser?.uid ?? storeUser?.id ?? null;
   const displayName =

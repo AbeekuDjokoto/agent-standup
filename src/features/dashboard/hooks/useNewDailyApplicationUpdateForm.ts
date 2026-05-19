@@ -1,28 +1,31 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import dayjs from 'dayjs';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import dayjs from 'dayjs';
 import { z } from 'zod';
 
-import { useAgentIdentity } from '@/hooks';
-import { createDailyActivity } from '@/services/activityService';
-import { useAuthStore } from '@/stores';
-import { getAuthDisplayName } from '@/utils/auth';
-import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
-import { ROUTES } from '@/utils/route-constants';
-import { isWeekendInTimeZone } from '@/utils/businessDays';
 import {
   newDailyApplicationUpdateSchema,
   type NewDailyApplicationUpdateValues,
 } from '@/features/dashboard/pages/NewDailyApplicationUpdate/newDailyApplicationUpdateSchema';
+import { useAgentIdentity } from '@/hooks';
+import { createDailyActivity } from '@/services/activityService';
+import { useAuthStore } from '@/stores';
+import { getAuthDisplayName } from '@/utils/auth';
+import { isWeekendInTimeZone } from '@/utils/businessDays';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { ROUTES } from '@/utils/route-constants';
 
 export function useNewDailyApplicationUpdateForm() {
   const navigate = useNavigate();
   const { agentUid, displayName, locationStation } = useAgentIdentity();
   const storeUser = useAuthStore((state) => state.user);
 
-  type NewDailyUpdateFormInput = z.input<typeof newDailyApplicationUpdateSchema>;
+  type NewDailyUpdateFormInput = z.input<
+    typeof newDailyApplicationUpdateSchema
+  >;
 
   const {
     register,
@@ -51,7 +54,9 @@ export function useNewDailyApplicationUpdateForm() {
 
   useEffect(() => {
     const fullName =
-      storeUser?.full_name?.trim() || getAuthDisplayName(storeUser) || displayName;
+      storeUser?.full_name?.trim() ||
+      getAuthDisplayName(storeUser) ||
+      displayName;
     const location = storeUser?.location_station ?? locationStation;
 
     reset((current) => ({

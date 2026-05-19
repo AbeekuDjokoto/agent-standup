@@ -1,6 +1,4 @@
 import DatePicker, { DatePickerProps } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import './DateInput.scss';
 
 import { cn, Icon } from '@/libs';
 
@@ -8,21 +6,22 @@ import { InputPrefixIconWrapper } from '../Input';
 import { InputLabel } from '../InputLabel';
 import { ErrorText } from '../Text';
 
-type Props = Readonly<
-  {
-    placeholder?: string;
-    value?: Date | null;
-    label?: string;
-    id?: string;
-    error?: string;
-    disabled?: boolean;
-    dateFormat?: string;
-    onChange?: DatePickerProps['onChange'];
-    innerClassName?: string;
-    showIcon?: boolean;
-    [other: string]: any;
-  }
->;
+import 'react-datepicker/dist/react-datepicker.css';
+import './DateInput.scss';
+
+type Props = Readonly<{
+  placeholder?: string;
+  value?: Date | null;
+  label?: string;
+  id?: string;
+  error?: string;
+  disabled?: boolean;
+  dateFormat?: string;
+  onChange?: DatePickerProps['onChange'];
+  innerClassName?: string;
+  showIcon?: boolean;
+  [other: string]: any;
+}>;
 export function DateInput(props: Props) {
   const {
     placeholder,

@@ -1,15 +1,16 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
-import { getPostLoginPath, getUserRoles } from '@/utils/auth';
-import { useAuthStore } from '@/stores';
-import { loginUser } from '@/services/authService';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import {
-  loginSchema,
   type LoginFormValues,
+  loginSchema,
 } from '@/features/auth/pages/Login/loginSchema';
+import { loginUser } from '@/services/authService';
+import { useAuthStore } from '@/stores';
+import { getPostLoginPath, getUserRoles } from '@/utils/auth';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 export function useLoginForm() {
   const navigate = useNavigate();
@@ -49,7 +50,10 @@ export function useLoginForm() {
     } catch (error) {
       setError('root', {
         type: 'server',
-        message: getApiErrorMessage(error, 'Unable to login. Please try again.'),
+        message: getApiErrorMessage(
+          error,
+          'Unable to login. Please try again.',
+        ),
       });
     }
   }

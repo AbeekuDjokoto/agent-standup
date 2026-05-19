@@ -1,10 +1,10 @@
 import { AdminOnlyRoute } from '../components/AdminOnlyRoute';
 import { AgentOnlyRoute } from '../components/AgentOnlyRoute';
 import { DashboardIndexRedirect } from '../components/DashboardIndexRedirect';
-import { Overview } from '../pages/Overview';
-import { DailyApplicationUpdates } from '../pages/DailyApplicationUpdates';
 import { Commissions } from '../pages/Commissions';
+import { DailyApplicationUpdates } from '../pages/DailyApplicationUpdates';
 import { NewDailyApplicationUpdate } from '../pages/NewDailyApplicationUpdate';
+import { Overview } from '../pages/Overview';
 
 export const userDashboaudRoutes = [
   {
