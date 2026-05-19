@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useAuthHydration } from '@/hooks/useAuthHydration';
 import { useToast } from '@/hooks';
@@ -92,17 +92,19 @@ export function useDailyUpdatesList({
 }: UseDailyUpdatesListOptions = {}) {
   const hasHydrated = useAuthHydration();
   const toast = useToast();
-  const authState = useAuthStore((state) => ({
-    user: state.user,
-    token: state.token,
-    expiresAt: state.expiresAt,
-    isAuthenticated: state.isAuthenticated,
-  }));
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
+  const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.token);
+  const expiresAt = useAuthStore((state) => state.expiresAt);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const isSessionReady =
-    hasHydrated && isAuthSessionValid(authState);
-  const roles = resolveUserRoles(authState.user, authState.token);
-  const isAdmin = isAdminView || isAdminSession(authState.user, authState.token);
+    hasHydrated &&
+    isAuthSessionValid({ token, expiresAt, isAuthenticated });
+  const rolesKey = resolveUserRoles(user, token).join(',');
+  const isAdmin = isAdminView || isAdminSession(user, token);
 
   const [dailyUpdates, setDailyUpdates] = useState<DailyUpdateRecord[]>([]);
   const [summary, setSummary] = useState<DailyActivitySummary | null>(null);
@@ -115,15 +117,16 @@ export function useDailyUpdatesList({
         return;
       }
 
-      if (!authState.isAuthenticated) {
+      if (!isAuthenticated) {
         setDailyUpdates([]);
         setSummary(null);
         setIsLoading(false);
         return;
       }
 
-      const { user, token } = useAuthStore.getState();
-      const useAdminEndpoint = isAdminView || isAdminSession(user, token);
+      const { user: sessionUser, token: sessionToken } = useAuthStore.getState();
+      const useAdminEndpoint =
+        isAdminView || isAdminSession(sessionUser, sessionToken);
 
       try {
         setIsLoading(true);
@@ -140,7 +143,7 @@ export function useDailyUpdatesList({
         setDailyUpdates(response.items.map(mapItemToRecord));
         setSummary(response.summary);
       } catch (error) {
-        toast.error(
+        toastRef.current.error(
           getApiErrorMessage(
             error,
             useAdminEndpoint
@@ -152,7 +155,7 @@ export function useDailyUpdatesList({
         setIsLoading(false);
       }
     },
-    [authState.isAuthenticated, isAdminView, isSessionReady, toast],
+    [isAuthenticated, isAdminView, isSessionReady],
   );
 
   useEffect(() => {
@@ -161,7 +164,7 @@ export function useDailyUpdatesList({
     }
 
     void loadDailyUpdates(dateFilter);
-  }, [isSessionReady, dateFilter, loadDailyUpdates, roles.join(',')]);
+  }, [isSessionReady, dateFilter, loadDailyUpdates, rolesKey]);
 
   const totalUpdates = summary?.total_updates ?? dailyUpdates.length;
   const totalApplications = summary?.total_applications ?? 0;

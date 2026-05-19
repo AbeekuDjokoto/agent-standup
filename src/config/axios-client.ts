@@ -10,6 +10,7 @@ import {
   isLogoutRequestUrl,
   isRefreshRequestUrl,
   shouldProactivelyRefresh,
+  shouldSyncAuthFromResponse,
   tryRefreshSession,
 } from '@/utils/sessionRefresh';
 
@@ -74,11 +75,18 @@ instance.interceptors.request.use(async (request: InternalAxiosRequestConfig) =>
 instance.interceptors.response.use(
   (response) => {
     const { data } = response;
+    const requestUrl = response.config?.url ?? '';
 
-    if (data?.access_token && data?.user && typeof data.expires_in === 'number') {
-      useAuthStore.getState().authenticateFromLoginResponse(data);
-    } else if (data?.user && !data.access_token) {
-      useAuthStore.getState().setUser(data.user);
+    if (shouldSyncAuthFromResponse(requestUrl)) {
+      if (
+        data?.access_token &&
+        data?.user &&
+        typeof data.expires_in === 'number'
+      ) {
+        useAuthStore.getState().authenticateFromLoginResponse(data);
+      } else if (data?.user && !data.access_token) {
+        useAuthStore.getState().setUser(data.user);
+      }
     }
 
     return data;

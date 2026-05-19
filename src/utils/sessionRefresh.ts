@@ -18,6 +18,19 @@ export function isCookieAuthRequestUrl(url?: string): boolean {
   return isRefreshRequestUrl(url) || isLogoutRequestUrl(url);
 }
 
+/** Only these responses should update the logged-in session in the auth store. */
+export function shouldSyncAuthFromResponse(url?: string): boolean {
+  if (!url) return false;
+
+  return (
+    url.includes('/auth/login') ||
+    url.includes('/auth/register') ||
+    url.includes('/auth/refresh') ||
+    url.includes('/auth/accept-admin-invite') ||
+    url.includes('/auth/me')
+  );
+}
+
 /** POST /auth/refresh using surge_refresh cookie; updates the auth store on success. */
 export async function tryRefreshSession(): Promise<boolean> {
   if (refreshInFlight) {

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useToast } from '@/hooks';
 import { fetchAgentProfile } from '@/services/adminService';
@@ -41,6 +41,8 @@ function getFilterParams(preset: DateFilterPreset) {
 
 export function useAgentProfileActivity(agentUuid: string | null) {
   const toast = useToast();
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
   const [agent, setAgent] = useState<UserPublic | null>(null);
   const [updates, setUpdates] = useState<DailyUpdateRecord[]>([]);
   const [summary, setSummary] = useState<DailyActivitySummary | null>(null);
@@ -77,7 +79,7 @@ export function useAgentProfileActivity(agentUuid: string | null) {
         );
         setSummary(activityResponse.summary);
       } catch (error) {
-        toast.error(
+        toastRef.current.error(
           getApiErrorMessage(error, 'Unable to load agent profile right now.'),
         );
         setAgent(null);
@@ -87,7 +89,7 @@ export function useAgentProfileActivity(agentUuid: string | null) {
         setIsLoading(false);
       }
     },
-    [toast],
+    [],
   );
 
   useEffect(() => {
