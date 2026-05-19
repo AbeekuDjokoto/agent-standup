@@ -5,6 +5,7 @@ import { NavigationBar } from '@/features/dashboard/components/Navigation';
 import { Button } from '@/components/Button';
 import { DateInput } from '@/components/DateInput/DateInput';
 import { Input } from '@/components/Input';
+import { Select } from '@/components/Select';
 import { LOCATION_OPTIONS } from '@/data/locationOptions';
 import { ROUTES } from '@/utils/route-constants';
 import { useNewDailyApplicationUpdateForm } from '@/features/dashboard/hooks';
@@ -59,32 +60,24 @@ export const NewDailyApplicationUpdate = () => {
               label="Agent Full Name"
               placeholder="e.g. Abeeku Djokoto"
               error={errors.fullName?.message}
-              {...register('fullName', { disabled: isWeekendBlocked })}
+              disabled
+              {...register('fullName', { disabled: true })}
             />
 
-            <div className="space-y-1.5">
-              <label
-                htmlFor="location"
-                className="text-sm font-medium text-neutral-grey-600"
-              >
-                Location
-              </label>
-              <select
-                id="location"
-                className="h-[42px] w-full rounded-[10px] border border-neutral-grey-100 bg-white px-3 text-sm text-neutral-grey-600 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] outline-none focus:border-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
-                {...register('location', { disabled: isWeekendBlocked })}
-              >
-                <option value="">Select location</option>
-                {LOCATION_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              {errors.location?.message ? (
-                <p className="text-xs text-semantics-red">{errors.location.message}</p>
-              ) : null}
-            </div>
+            <Select
+              id="location"
+              label="Location"
+              error={errors.location?.message}
+              disabled
+              {...register('location', { disabled: true })}
+            >
+              <option value="">Select location</option>
+              {LOCATION_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </Select>
 
             <Input
               label="Applications Count"

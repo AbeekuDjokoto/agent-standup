@@ -1,8 +1,7 @@
 import { ROUTES } from './route-constants';
 
 export const ENV_VARS = {
-  API_BASE_URL:
-    import.meta.env.VITE_API_BASE_URL || 'https://alertsavings-api.enyata.com',
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
   FCM_TOKEN: import.meta.env.VITE_FCM_TOKEN || '',
 };
 

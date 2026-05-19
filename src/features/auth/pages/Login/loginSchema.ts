@@ -1,8 +1,9 @@
-import { getRequiredStringSchema } from '@/utils/schemas';
 import { z } from 'zod';
 
+import { getRequiredEmailSchema, getRequiredStringSchema } from '@/utils/schemas';
+
 export const loginSchema = z.object({
-  identifier: getRequiredStringSchema('Email address or phone number'),
+  email: getRequiredEmailSchema('Email address'),
   password: getRequiredStringSchema('Password'),
   rememberMe: z.boolean().optional(),
 });

@@ -1,6 +1,7 @@
 export * from './ErrorPage';
 export * from './Text';
 export * from './Input';
+export * from './Select';
 export * from './InputLabel';
 export * from './IconPreloader';
 export * from './Providers';

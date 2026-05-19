@@ -1,75 +1,86 @@
-// import { jwtDecode } from 'jwt-decode';
-import { jwtDecode } from 'jwt-decode';
 import { create, StateCreator } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
-import type { AdminUser, User } from '@/types';
+import type { AuthUser, LoginApiResponse } from '@/types/auth';
+import { isAuthSessionValid } from '@/utils/auth';
 
 type State = {
   token?: string | null;
-  user?: User | AdminUser | null;
+  user?: AuthUser | null;
+  expiresAt?: number | null;
   isAuthenticated: boolean;
   redirect?: string;
   loginUrl: string;
   fcmToken?: string | null;
 };
 
+type AuthenticateInput = {
+  accessToken: string;
+  user: AuthUser;
+  expiresIn: number;
+  loginUrl?: string;
+};
+
 type Actions = {
-  /** reset auth store to initial state */
   reset: () => void;
-  /**
-   * authenticate user
-   * @param {Object} details - object containing user object and token
-   */
-  // authenticate: (details: { token: string; loginUrl?: string }) => void;
-  authenticate: (details: any) => void;
+  authenticate: (details: AuthenticateInput) => AuthUser;
+  authenticateFromLoginResponse: (response: LoginApiResponse) => AuthUser;
   setRedirect: (redirect: string) => void;
   getToken: () => State['token'];
-  setToken: (newToken: string) => void;
   logout: () => void;
-  setUser: (newUser: User | AdminUser) => void;
+  setUser: (newUser: AuthUser) => void;
   setFcmToken: (newFcmToken: string) => void;
+  isSessionValid: () => boolean;
 };
 
 const initialState: State = {
   token: null,
   isAuthenticated: false,
   user: null,
+  expiresAt: null,
   loginUrl: '/auth/login',
 };
 
 const authStore: StateCreator<State & Actions> = (set, get) => ({
   ...initialState,
   reset: () => set(initialState),
-  authenticate: ({ token, loginUrl = '/auth/login' }) => {
-    const user: User = jwtDecode(token);
+  authenticate: ({
+    accessToken,
+    user,
+    expiresIn,
+    loginUrl = '/auth/login',
+  }) => {
+    const expiresAt = Date.now() + expiresIn * 1000;
     set({
       user,
-      token,
+      token: accessToken,
+      expiresAt,
       isAuthenticated: true,
       loginUrl,
     });
+    return user;
   },
-  logout: () => set({ isAuthenticated: false }),
+  authenticateFromLoginResponse: (response) =>
+    get().authenticate({
+      accessToken: response.access_token,
+      user: response.user,
+      expiresIn: response.expires_in,
+    }),
+  logout: () => set({ ...initialState }),
   setRedirect: (redirect: string) => set({ redirect }),
   getToken: () => get().token,
-  setToken: (newToken: string) => set({ token: newToken }),
-  setUser: (newUser: User | AdminUser) => set({ user: newUser }),
+  setUser: (newUser: AuthUser) => set({ user: newUser }),
   setFcmToken: (newFcmToken: string) => set({ fcmToken: newFcmToken }),
+  isSessionValid: () => isAuthSessionValid(get()),
 });
 
 const useAuthStore = create(
   persist(authStore, {
-    name: 'goldbucks-web-auth-store',
-    storage: {
-      getItem: (name) => {
-        const str = sessionStorage.getItem(name);
-        return str ? JSON.parse(str) : null;
-      },
-      setItem: (name, value) => {
-        sessionStorage.setItem(name, JSON.stringify(value));
-      },
-      removeItem: (name) => sessionStorage.removeItem(name),
+    name: 'surge-web-auth-store',
+    storage: createJSONStorage(() => sessionStorage),
+    onRehydrateStorage: () => () => {
+      // Expired access JWT may still be renewable via surge_refresh cookie.
+      // useSessionBootstrap attempts refresh before clearing the session.
     },
   }),
 );

@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 import { useToast } from '@/hooks';
-import {
-  doSignInWithEmailAndPassword,
-  doSignInWithGoogle,
-} from '@/features/auth/hooks/auth';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { getPostLoginPath, getUserRoles } from '@/utils/auth';
+import { useAuthStore } from '@/stores';
+import { loginUser } from '@/services/authService';
 import {
   loginSchema,
   type LoginFormValues,
@@ -13,55 +14,46 @@ import {
 
 export function useLoginForm() {
   const toast = useToast();
+  const navigate = useNavigate();
+  const authenticateFromLoginResponse = useAuthStore(
+    (state) => state.authenticateFromLoginResponse,
+  );
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty, isSubmitting },
+    formState: { errors, isValid, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     mode: 'onChange',
     defaultValues: {
-      identifier: '',
+      email: '',
       password: '',
       rememberMe: true,
     },
   });
 
   async function onSubmit(formValues: LoginFormValues) {
-    const identifier = formValues.identifier.trim();
-    const password = formValues.password;
-
     try {
-      await doSignInWithEmailAndPassword(identifier, password);
+      const response = await loginUser({
+        email: formValues.email.trim(),
+        password: formValues.password,
+      });
+
+      const user = authenticateFromLoginResponse(response);
+      const roles = getUserRoles(user);
+
       toast.success('Login successful.');
+      navigate(getPostLoginPath(roles));
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Unable to login. Please try again.';
-      toast.error(message);
+      toast.error(getApiErrorMessage(error, 'Unable to login. Please try again.'));
     }
   }
 
-  const onGoogleSignIn = async () => {
-    try {
-      await doSignInWithGoogle();
-      toast.success('Signed in with Google.');
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Google sign-in failed. Please try again.';
-      toast.error(message);
-    }
-  };
-
   return {
     register,
-    formState: { errors, isValid, isDirty, isSubmitting },
+    formState: { errors, isValid, isSubmitting },
     handleSubmit,
     onSubmit,
-    onGoogleSignIn,
   };
 }

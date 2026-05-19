@@ -1,12 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { serverTimestamp } from 'firebase/firestore';
+import dayjs from 'dayjs';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
-import { useAuth } from '@/context/authContext';
-import { useToast } from '@/hooks';
-import { postAgentRecord } from '@/services/agentService';
+import { useAgentIdentity, useToast } from '@/hooks';
+import { createDailyActivity } from '@/services/activityService';
+import { useAuthStore } from '@/stores';
+import { getAuthDisplayName } from '@/utils/auth';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { ROUTES } from '@/utils/route-constants';
 import { isWeekendInTimeZone } from '@/utils/businessDays';
 import {
@@ -17,7 +20,8 @@ import {
 export function useNewDailyApplicationUpdateForm() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { currentUser } = useAuth();
+  const { agentUid, displayName, locationStation } = useAgentIdentity();
+  const storeUser = useAuthStore((state) => state.user);
 
   type NewDailyUpdateFormInput = z.input<typeof newDailyApplicationUpdateSchema>;
 
@@ -25,6 +29,8 @@ export function useNewDailyApplicationUpdateForm() {
     register,
     control,
     handleSubmit,
+    reset,
+    trigger,
     formState: { errors, isSubmitting, isValid },
   } = useForm<
     NewDailyUpdateFormInput,
@@ -34,18 +40,34 @@ export function useNewDailyApplicationUpdateForm() {
     resolver: zodResolver(newDailyApplicationUpdateSchema),
     mode: 'onChange',
     defaultValues: {
-      fullName: currentUser?.displayName ?? '',
-      location: '',
+      fullName: displayName,
+      location: locationStation,
       applicationsCount: '',
       totalAmount: '',
       updateDate: new Date(),
     },
   });
 
+  useEffect(() => {
+    const fullName =
+      storeUser?.full_name?.trim() || getAuthDisplayName(storeUser) || displayName;
+    const location = storeUser?.location_station ?? locationStation;
+
+    reset((current) => ({
+      ...current,
+      fullName,
+      location,
+    }));
+
+    void trigger(['fullName', 'location']);
+  }, [storeUser, displayName, locationStation, reset, trigger]);
+
   const isWeekendBlocked = isWeekendInTimeZone();
 
   const onSubmit = async (values: NewDailyApplicationUpdateValues) => {
-    if (!currentUser?.uid) {
+    const userId = storeUser?.id ?? agentUid;
+
+    if (!userId) {
       toast.error('You must be logged in to submit an update.');
       return;
     }
@@ -57,24 +79,28 @@ export function useNewDailyApplicationUpdateForm() {
       return;
     }
 
+    const agentFullName =
+      storeUser?.full_name?.trim() ||
+      getAuthDisplayName(storeUser) ||
+      values.fullName;
+    const location = storeUser?.location_station ?? values.location;
+
     try {
-      await postAgentRecord({
-        ...values,
-        agentUid: currentUser.uid,
-        agentEmail: currentUser.email ?? '',
-        status: 'Submitted',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+      await createDailyActivity({
+        agent_uuid: userId,
+        agent_full_name: agentFullName,
+        location,
+        applications_count: values.applicationsCount,
+        loan_amount: values.totalAmount,
+        update_date: dayjs(values.updateDate).format('YYYY-MM-DD'),
       });
 
       toast.success('Daily update submitted successfully.');
       navigate(ROUTES.user.dashboard.dailyApplicationUpdates);
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Unable to submit daily update. Please try again.';
-      toast.error(message);
+      toast.error(
+        getApiErrorMessage(error, 'Unable to submit daily update. Please try again.'),
+      );
     }
   };
 

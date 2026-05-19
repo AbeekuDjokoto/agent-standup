@@ -1,6 +1,15 @@
 import type { RouteObject } from 'react-router-dom';
-import { ForgotPassword, Login, Register } from '../pages';
+import { Navigate, useLocation } from 'react-router-dom';
+
+import { AcceptAdminInvite, ForgotPassword, Login, Register } from '../pages';
 import { ROUTES } from '@/utils/route-constants';
+
+function LegacyAuthResetPasswordRedirect() {
+  const { search } = useLocation();
+  return (
+    <Navigate to={`${ROUTES.user.auth.forgotPassword}${search}`} replace />
+  );
+}
 
 export const userAuthRoutes: RouteObject[] = [
   {
@@ -16,6 +25,10 @@ export const userAuthRoutes: RouteObject[] = [
     element: <Register />,
   },
   {
+    path: ROUTES.user.auth.acceptAdminInvite.replace('/auth/', ''),
+    element: <AcceptAdminInvite />,
+  },
+  {
     path: 'forgot-password',
     element: <ForgotPassword />,
   },
@@ -25,6 +38,6 @@ export const userAuthRoutes: RouteObject[] = [
   },
   {
     path: ROUTES.user.auth.resetPassword.replace('/auth/', ''),
-    element: <ForgotPassword />,
+    element: <LegacyAuthResetPasswordRedirect />,
   },
 ];

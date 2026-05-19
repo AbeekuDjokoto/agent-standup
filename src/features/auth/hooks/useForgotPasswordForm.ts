@@ -1,10 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import { useToast } from '@/hooks';
-import { ROUTES } from '@/utils/route-constants';
-import { doPasswordReset, doSignInWithGoogle } from '@/features/auth/hooks/auth';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import {
+  getForgotPasswordSuccessMessage,
+  getResetPasswordPathFromUrl,
+} from '@/utils/auth';
+import { requestPasswordReset } from '@/services/authService';
 import {
   forgotPasswordSchema,
   type ForgotPasswordFormValues,
@@ -13,6 +18,8 @@ import {
 export function useForgotPasswordForm() {
   const toast = useToast();
   const navigate = useNavigate();
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const {
     register,
@@ -28,37 +35,34 @@ export function useForgotPasswordForm() {
 
   async function onSubmit(values: ForgotPasswordFormValues) {
     try {
-      await doPasswordReset(values.email.trim());
-      toast.success('Password reset email sent. Check your inbox.');
-      navigate(ROUTES.user.auth.login);
+      const response = await requestPasswordReset({
+        email: values.email.trim(),
+      });
+
+      const message = getForgotPasswordSuccessMessage(response);
+
+      if (response.reset_url) {
+        toast.success(message);
+        navigate(getResetPasswordPathFromUrl(response.reset_url));
+        return;
+      }
+
+      setSuccessMessage(message);
+      setIsSubmitted(true);
+      toast.success(message);
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Unable to send reset email. Please try again.';
-      toast.error(message);
+      toast.error(
+        getApiErrorMessage(error, 'Unable to send reset instructions. Please try again.'),
+      );
     }
   }
-
-  const onGoogleSignIn = async () => {
-    try {
-      await doSignInWithGoogle();
-      toast.success('Signed in with Google.');
-      navigate(ROUTES.user.dashboard.overview);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Google sign-in failed. Please try again.';
-      toast.error(message);
-    }
-  };
 
   return {
     register,
     formState: { errors, isValid, isSubmitting },
     handleSubmit,
     onSubmit,
-    onGoogleSignIn,
+    isSubmitted,
+    successMessage,
   };
 }

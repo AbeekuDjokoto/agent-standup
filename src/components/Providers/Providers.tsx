@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NuqsAdapter } from 'nuqs/adapters/react';
 
-
 import { ToastProvider } from '../ToastProvider';
 import { useTabRestorationDetection } from '@/hooks/useTabRestorationDetection';
 import { AuthProvider } from '@/context/authContext';
@@ -9,7 +8,6 @@ import { AuthProvider } from '@/context/authContext';
 const queryClient = new QueryClient();
 
 function AppInitializer({ children }: { children: React.ReactNode }) {
-  // Initialize tab restoration detection
   useTabRestorationDetection();
 
   return <>{children}</>;

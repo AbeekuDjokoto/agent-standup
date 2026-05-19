@@ -3,16 +3,13 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import { useToast } from '@/hooks';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { ROUTES } from '@/utils/route-constants';
-import {
-  doCreateUserWithEmailAndPassword,
-  doSendEmailVerification,
-  doSignInWithGoogle,
-} from '@/features/auth/hooks/auth';
 import {
   registerSchema,
   type RegisterFormValues,
 } from '@/features/auth/pages/Register/registerSchema';
+import { registerUser } from '@/services/authService';
 
 export function useRegisterForm() {
   const toast = useToast();
@@ -29,50 +26,32 @@ export function useRegisterForm() {
       fullName: '',
       email: '',
       password: '',
-      confirmPassword: '',
+      locationStation: '',
     },
   });
 
   async function onSubmit(values: RegisterFormValues) {
     try {
-      await doCreateUserWithEmailAndPassword(values.email.trim(), values.password);
+      await registerUser({
+        full_name: values.fullName.trim(),
+        email: values.email.trim(),
+        password: values.password,
+        location_station: values.locationStation,
+      });
 
-      try {
-        await doSendEmailVerification();
-      } catch {
-        // Non-blocking: registration succeeded even if email verification fails.
-      }
-
-      toast.success('Account created successfully.');
-      navigate(ROUTES.user.dashboard.overview);
+      toast.success('Account created successfully. Please log in.');
+      navigate(ROUTES.user.auth.login);
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Unable to create account. Please try again.';
-      toast.error(message);
+      toast.error(
+        getApiErrorMessage(error, 'Unable to create account. Please try again.'),
+      );
     }
   }
-
-  const onGoogleSignIn = async () => {
-    try {
-      await doSignInWithGoogle();
-      toast.success('Signed up with Google.');
-      navigate(ROUTES.user.dashboard.overview);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Google sign-up failed. Please try again.';
-      toast.error(message);
-    }
-  };
 
   return {
     register,
     formState: { errors, isValid, isSubmitting },
     handleSubmit,
     onSubmit,
-    onGoogleSignIn,
   };
 }

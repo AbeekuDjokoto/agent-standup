@@ -68,21 +68,43 @@ export function getOptionalFileSchema(label: string = 'Field') {
     .optional();
 }
 
-export function getPasswordVerificationSchema(label: string = 'Field') {
+export function getAdminInvitePasswordSchema(label: string = 'Password') {
   return z
     .string()
-    .min(8, { message: `${label} must be at least 8 characters long.` })
+    .trim()
+    .min(12, { message: `${label} must be at least 12 characters.` })
+    .max(128, { message: `${label} must be at most 128 characters.` })
+    .refine((val) => /[a-z]/.test(val), {
+      message: `${label} must include at least one lowercase letter.`,
+    })
+    .refine((val) => /[A-Z]/.test(val), {
+      message: `${label} must include at least one uppercase letter.`,
+    })
     .refine((val) => /\d/.test(val), {
       message: `${label} must include at least one number.`,
     })
-    .refine((val) => /[a-zA-Z]/.test(val), {
-      message: `${label} must include at least one letter.`,
+    .refine((val) => /[^A-Za-z0-9]/.test(val), {
+      message: `${label} must include at least one special character.`,
+    });
+}
+
+export function getPasswordVerificationSchema(label: string = 'Field') {
+  return z
+    .string()
+    .trim()
+    .min(8, { message: `${label} must be at least 8 characters.` })
+    .max(128, { message: `${label} must be at most 128 characters.` })
+    .refine((val) => /[a-z]/.test(val), {
+      message: `${label} must include at least one lowercase letter.`,
     })
     .refine((val) => /[A-Z]/.test(val), {
-      message: `${label} must include at least a capital letter.`,
+      message: `${label} must include at least one uppercase letter.`,
     })
-    .refine((val) => /[!@#$%^&*]/.test(val), {
-      message: `${label} must contain at least one symbol.`,
+    .refine((val) => /\d/.test(val), {
+      message: `${label} must include at least one number.`,
+    })
+    .refine((val) => /[^A-Za-z0-9]/.test(val), {
+      message: `${label} must include at least one special character.`,
     });
 }
 

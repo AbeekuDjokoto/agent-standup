@@ -1,3 +1,4 @@
+/** Location stations for registration and daily updates. */
 export const LOCATION_OPTIONS = [
   'Accra - 1',
   'Accra - 2',
@@ -8,4 +9,4 @@ export const LOCATION_OPTIONS = [
   'Koforidua',
   'Tamale',
   'Sunyani',
-]
+];

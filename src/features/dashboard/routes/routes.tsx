@@ -1,21 +1,23 @@
-import { Navigate } from 'react-router-dom';
-
-import { ROUTES } from '@/utils/route-constants';
+import { AdminOnlyRoute } from '../components/AdminOnlyRoute';
+import { AgentOnlyRoute } from '../components/AgentOnlyRoute';
+import { DashboardIndexRedirect } from '../components/DashboardIndexRedirect';
 import { Overview } from '../pages/Overview';
 import { DailyApplicationUpdates } from '../pages/DailyApplicationUpdates';
 import { Commissions } from '../pages/Commissions';
 import { NewDailyApplicationUpdate } from '../pages/NewDailyApplicationUpdate';
 
-
-
 export const userDashboaudRoutes = [
   {
     index: true,
-    element: <Navigate to={ROUTES.user.dashboard.overview} />,
+    element: <DashboardIndexRedirect />,
   },
   {
     path: 'overview',
-    element: <Overview />,
+    element: (
+      <AdminOnlyRoute>
+        <Overview />
+      </AdminOnlyRoute>
+    ),
   },
   {
     path: 'daily-application-updates',
@@ -23,14 +25,22 @@ export const userDashboaudRoutes = [
   },
   {
     path: 'daily-application-updates/new',
-    element: <NewDailyApplicationUpdate />,
+    element: (
+      <AgentOnlyRoute>
+        <NewDailyApplicationUpdate />
+      </AgentOnlyRoute>
+    ),
   },
   {
     path: 'commissions',
-    element: <Commissions />,
+    element: (
+      <AdminOnlyRoute>
+        <Commissions />
+      </AdminOnlyRoute>
+    ),
   },
   {
     path: '*',
-    element: <Navigate to={ROUTES.user.dashboard.overview} replace />,
+    element: <DashboardIndexRedirect />,
   },
 ];

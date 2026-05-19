@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Checkbox } from '@/components';
+import userLineIcon from '@/assets/svgs/user-line.svg';
 import { useLoginForm } from '@/features/auth/hooks';
 import { ROUTES } from '@/utils/route-constants';
 
@@ -13,14 +14,13 @@ export const Login = () => {
         formState: { errors, isValid, isSubmitting },
         handleSubmit,
         onSubmit,
-        onGoogleSignIn,
     } = useLoginForm();
 
     return (
         <section className="rounded-[36px] bg-white p-6">
             <div className="flex flex-col items-center gap-2">
                 <div className="grid h-16 w-16 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
-                    <span className="text-xl text-brand-primary">👤</span>
+                    <img src={userLineIcon} alt="" className="h-8 w-8" aria-hidden />
                 </div>
                 <h1 className="text-center text-2xl leading-8 font-medium text-neutral-grey-600">
                     Login to your account
@@ -34,10 +34,12 @@ export const Login = () => {
 
             <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
                 <Input
-                    label="Email Address or Phone Number"
-                    placeholder="hello@surgeafrica.com or 0559617908"
-                    error={errors.identifier?.message}
-                    {...register('identifier')}
+                    label="Email Address"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="hello@surgeafrica.com"
+                    error={errors.email?.message}
+                    {...register('email')}
                 />
 
                 <Input
@@ -66,19 +68,6 @@ export const Login = () => {
                     disabled={!isValid || isSubmitting}
                 >
                     {isSubmitting ? 'Logging in...' : 'Login'}
-                </Button>
-
-                <Button
-                    type="button"
-                    variant="google"
-                    size="auth"
-                    className="w-full"
-                    icon="logos:google-icon"
-                    iconPosition="left"
-                    onClick={onGoogleSignIn}
-                    disabled={isSubmitting}
-                >
-                    Sign in with Google
                 </Button>
             </form>
 
