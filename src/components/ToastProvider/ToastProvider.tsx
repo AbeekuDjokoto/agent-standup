@@ -1,7 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 
-import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   CloseCircle,
   Danger,
@@ -27,18 +27,8 @@ export function ToastProvider({
       type: ToastNotificationType;
       id: string;
       ended?: boolean;
-      nodeRef?: React.RefObject<HTMLDivElement>;
     }[]
-  >([
-    // {
-    //   message: 'This is a success toast',
-    //   title: 'Success',
-    //   type: 'success',
-    //   id: nanoid(),
-    // },
-    // { message: 'This is an error toast', type: 'error', id: nanoid() },
-    // { message: 'This is an info toast', type: 'info', id: nanoid() },
-  ]);
+  >([]);
 
   function removeNotification(id: string) {
     setNotificationList((list) => list.filter((item) => item.id !== id));
@@ -49,12 +39,12 @@ export function ToastProvider({
       const id = nanoid();
       setNotificationList((list) => [
         ...list,
-        { message, type, id, title, nodeRef: React.createRef() },
+        { message, type, id, title },
       ]);
 
       setTimeout(() => removeNotification(id), 4000);
     },
-    [setNotificationList],
+    [],
   );
 
   const variantStyles: Record<ToastNotificationType, string> = {
@@ -68,70 +58,73 @@ export function ToastProvider({
     error: CloseCircle,
     info: Danger,
   };
+
   return (
     <>
       <ToastContextProvider addMessage={addMessage}>
         {children}
       </ToastContextProvider>
       {createPortal(
-        <ul className="pointer-events-none fixed inset-x-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[1000] grid w-auto max-w-none gap-2 sm:inset-x-auto sm:right-5 sm:left-auto sm:w-[min(340px,calc(100vw-2.5rem))] sm:gap-3">
-          <LayoutGroup>
-            <AnimatePresence>
-              {notificationList
-                .filter((item) => !item.ended)
-                .map(({ id, message, title, type }, index) => {
-                  const VariantIcon = variantIcons[type];
-                  return (
-                    <motion.li
-                      layout
-                      initial={{ x: '150%' }}
-                      animate={{ x: 0 }}
-                      exit={{
-                        opacity: 0,
-                        transition: { duration: 0.2 },
-                      }}
-                      transition={{
-                        delay: index * 0.05,
-                        stiffness: 150,
-                        damping: 14,
-                        type: 'spring',
-                      }}
-                      className={cn(
-                        'pointer-events-auto grid grid-cols-[max-content_1fr_max-content_max-content] items-start gap-1.5 sm:gap-2',
-                        'rounded-[10px] p-2.5 shadow sm:p-4 sm:py-[13px]',
-                        variantStyles[type],
-                      )}
-                      key={id}
-                    >
-                      <VariantIcon
-                        width={20}
-                        height={20}
-                        variant="Bold"
-                        className="mt-0.5 shrink-0 sm:mt-[1px] sm:h-6 sm:w-6"
-                      />
-                      <div className="min-w-0 flex flex-col gap-0.5 sm:gap-1">
-                        {title ? (
-                          <span className="text-sm font-semibold leading-snug sm:text-base sm:leading-[1.375]">
-                            {title}
-                          </span>
-                        ) : null}
-                        <span className="inline-block text-xs leading-snug sm:my-0.5 sm:text-sm">
-                          {message}
-                        </span>
-                      </div>
-                      <div className="relative border-l border-neutral-grey-100/20 h-full -right-1"></div>
-                      <button
-                        onClick={() => removeNotification(id)}
-                        data-testid="close-toast"
-                        type="button"
+        <ul
+          role="status"
+          aria-live="polite"
+          className="pointer-events-none fixed left-3 right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[1000] flex w-auto max-w-none flex-col gap-2 sm:left-auto sm:right-5 sm:w-[min(340px,calc(100vw-2.5rem))]"
+        >
+          <AnimatePresence>
+            {notificationList
+              .filter((item) => !item.ended)
+              .map(({ id, message, title, type }, index) => {
+                const VariantIcon = variantIcons[type];
+                return (
+                  <motion.li
+                    key={id}
+                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                    transition={{
+                      delay: index * 0.05,
+                      duration: 0.2,
+                    }}
+                    className={cn(
+                      'pointer-events-auto flex w-full items-start gap-2.5 rounded-[10px] p-3 shadow',
+                      'h-auto max-h-none',
+                      variantStyles[type],
+                    )}
+                  >
+                    <VariantIcon
+                      width={20}
+                      height={20}
+                      variant="Bold"
+                      className="mt-0.5 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      {title ? (
+                        <p className="text-sm font-semibold leading-snug">
+                          {title}
+                        </p>
+                      ) : null}
+                      <p
+                        className={cn(
+                          'text-sm leading-snug',
+                          title ? 'mt-0.5' : undefined,
+                        )}
                       >
-                        <Icon icon="si:close-line" width="20" className="sm:h-6 sm:w-6" />
-                      </button>
-                    </motion.li>
-                  );
-                })}
-            </AnimatePresence>
-          </LayoutGroup>
+                        {message}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeNotification(id)}
+                      data-testid="close-toast"
+                      className="-mr-0.5 shrink-0 rounded p-0.5 opacity-90 hover:opacity-100"
+                      aria-label="Dismiss notification"
+                    >
+                      <Icon icon="si:close-line" width={18} height={18} />
+                    </button>
+                  </motion.li>
+                );
+              })}
+          </AnimatePresence>
         </ul>,
         document.body,
       )}
