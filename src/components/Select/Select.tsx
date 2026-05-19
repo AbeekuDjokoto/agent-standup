@@ -31,7 +31,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             id={selectId}
             disabled={disabled}
             className={cn(
-              'h-[42px] w-full appearance-none rounded-[10px] border border-neutral-grey-100 bg-white py-0 pl-3 pr-10 text-sm text-neutral-grey-600 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] outline-none focus:border-brand-primary',
+              'h-[42px] w-full appearance-none rounded-[10px] border border-neutral-grey-100 bg-white py-0 pl-3 pr-10 text-base text-neutral-grey-600 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] outline-none focus:border-brand-primary',
               disabledSelectStyles,
               className,
             )}

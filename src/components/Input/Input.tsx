@@ -63,26 +63,42 @@ export const Input = React.forwardRef(
       }
     }, [type, show]);
 
+    const { onFocus: onFocusProp, ...inputProps } = otherProps;
+
     const computedInputClassName = cn(
-      'w-full min-w-[0px] self-stretch border-none bg-transparent text-sm text-neutral-grey-600 outline-none',
+      // 16px prevents iOS Safari auto-zoom on focus, which can lock scrolling with overflow-x hidden.
+      'w-full min-w-0 self-stretch border-none bg-transparent text-base text-neutral-grey-600 outline-none',
       'placeholder:text-neutral-grey-300 disabled:cursor-not-allowed',
       inputClassName,
     );
 
     function focusOnInput() {
-      const input = wrapperRef.current?.querySelector('input');
-      if (!input) return;
-      input.focus();
+      const field = wrapperRef.current?.querySelector('input, textarea');
+      if (!field || field === document.activeElement) return;
+      field.focus();
     }
 
-    function handleWrapperClick(e: React.MouseEvent<HTMLDivElement>) {
-      e.stopPropagation();
+    function handleInnerClick(e: React.MouseEvent<HTMLDivElement>) {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.closest('button')
+      ) {
+        return;
+      }
       focusOnInput();
     }
 
-    function handleLabelClick(e: React.MouseEvent<HTMLLabelElement>) {
-      e.stopPropagation();
-      focusOnInput();
+    function handleFieldFocus(
+      e: React.FocusEvent<HTMLInputElement & HTMLTextAreaElement>,
+    ) {
+      onFocusProp?.(e);
+      if (window.innerWidth < 768) {
+        window.setTimeout(() => {
+          e.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }, 300);
+      }
     }
 
     function handleToggleShow() {
@@ -94,15 +110,13 @@ export const Input = React.forwardRef(
       /* WRAPPER */
       <div
         ref={wrapperRef}
-        className={cn('wrapper', className)}
-        onClick={handleWrapperClick}
+        className={cn('wrapper min-w-0', className)}
       >
         {/* LABEL */}
         {label ? (
           <InputLabel
             htmlFor={props?.id ?? props.name}
-            onClick={handleLabelClick}
-            className="flex gap-1 items-center"
+            className="flex items-center gap-1"
           >
             {label} {labelChild}
           </InputLabel>
@@ -110,12 +124,13 @@ export const Input = React.forwardRef(
 
         {/* INNER */}
         <div
+          onClick={handleInnerClick}
           className={cn(
             'flex items-center gap-2 rounded-[10px] border border-neutral-grey-100 bg-white px-3 py-[10px]',
             'shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] focus-within:border-brand-primary',
             { 'border-semantics-red': !!error },
             { 'h-[42px]': !isTextarea },
-            { 'bg-[#F3F3F4]': otherProps.disabled },
+            { 'bg-[#F3F3F4]': inputProps.disabled },
             innerClassName,
           )}
         >
@@ -132,8 +147,9 @@ export const Input = React.forwardRef(
               type={computedType}
               ref={ref}
               className={computedInputClassName}
-              id={id ?? otherProps.name}
-              {...otherProps}
+              id={id ?? inputProps.name}
+              onFocus={handleFieldFocus}
+              {...inputProps}
             />
           ) : null}
 
@@ -143,8 +159,9 @@ export const Input = React.forwardRef(
               data-testid={computedTestId}
               className={computedInputClassName}
               ref={ref}
-              id={id ?? otherProps.name}
-              {...otherProps}
+              id={id ?? inputProps.name}
+              onFocus={handleFieldFocus}
+              {...inputProps}
             ></textarea>
           ) : null}
 

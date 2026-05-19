@@ -199,7 +199,7 @@ export function DailyUpdatesPanel({
             <span className="md:hidden">{mobileRecentHeading}</span>
             <span className="hidden md:inline">{recentHeading}</span>
           </h2>
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
+          <div className="flex flex-wrap gap-2">
             {(['today', 'week', 'all'] as DateFilterPreset[]).map((preset) => (
               <button
                 key={preset}
