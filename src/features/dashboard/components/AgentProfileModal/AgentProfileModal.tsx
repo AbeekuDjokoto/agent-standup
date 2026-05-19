@@ -1,9 +1,7 @@
 import { Modal } from '@/components/Modal';
 import { Button } from '@/components/Button';
-import {
-  useAgentProfileActivity,
-  type DateFilterPreset,
-} from '@/features/dashboard/hooks/useAgentProfileActivity';
+import { useAgentProfileActivity } from '@/features/dashboard/hooks/useAgentProfileActivity';
+import type { DateFilterPreset } from '@/features/dashboard/hooks/useDailyUpdatesList';
 import { getAuthDisplayName } from '@/utils/auth';
 
 type AgentProfileModalProps = {
