@@ -74,7 +74,7 @@ export function ToastProvider({
         {children}
       </ToastContextProvider>
       {createPortal(
-        <ul className="fixed z-[1000] grid gap-3 right-5 top-5 w-[340px]">
+        <ul className="pointer-events-none fixed inset-x-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[1000] grid w-auto max-w-none gap-2 sm:inset-x-auto sm:right-5 sm:left-auto sm:w-[min(340px,calc(100vw-2.5rem))] sm:gap-3">
           <LayoutGroup>
             <AnimatePresence>
               {notificationList
@@ -97,25 +97,25 @@ export function ToastProvider({
                         type: 'spring',
                       }}
                       className={cn(
-                        'grid grid-cols-[max-content_1fr_max-content_max-content] items-start gap-2',
-                        'shadow p-4 py-[13px] rounded-[10px]',
+                        'pointer-events-auto grid grid-cols-[max-content_1fr_max-content_max-content] items-start gap-1.5 sm:gap-2',
+                        'rounded-[10px] p-2.5 shadow sm:p-4 sm:py-[13px]',
                         variantStyles[type],
                       )}
                       key={id}
                     >
                       <VariantIcon
-                        width={24}
-                        height={24}
+                        width={20}
+                        height={20}
                         variant="Bold"
-                        className="mt-[1px]"
+                        className="mt-0.5 shrink-0 sm:mt-[1px] sm:h-6 sm:w-6"
                       />
-                      <div className="flex flex-col gap-1">
+                      <div className="min-w-0 flex flex-col gap-0.5 sm:gap-1">
                         {title ? (
-                          <span className="text-base font-semibold leading-[1.375]">
+                          <span className="text-sm font-semibold leading-snug sm:text-base sm:leading-[1.375]">
                             {title}
                           </span>
                         ) : null}
-                        <span className="inline-block my-0.5 text-sm">
+                        <span className="inline-block text-xs leading-snug sm:my-0.5 sm:text-sm">
                           {message}
                         </span>
                       </div>
@@ -125,7 +125,7 @@ export function ToastProvider({
                         data-testid="close-toast"
                         type="button"
                       >
-                        <Icon icon="si:close-line" width="24" />
+                        <Icon icon="si:close-line" width="20" className="sm:h-6 sm:w-6" />
                       </button>
                     </motion.li>
                   );

@@ -2,6 +2,10 @@ import { Navigate } from 'react-router-dom';
 
 import { DailyUpdatesPanel } from '@/features/dashboard/components/DailyUpdatesPanel';
 import { NavigationBar } from '@/features/dashboard/components/Navigation';
+import {
+  dashboardMainClassName,
+  dashboardPageClassName,
+} from '@/features/dashboard/dashboardPageStyles';
 import { useAuthStore } from '@/stores';
 import { isAdminSession } from '@/utils/auth';
 import { ROUTES } from '@/utils/route-constants';
@@ -16,9 +20,9 @@ export const DailyApplicationUpdates = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f9fafa] p-3 md:p-4">
+    <div className={dashboardPageClassName}>
       <NavigationBar />
-      <main className="mt-3 space-y-3 md:mt-4 md:space-y-4">
+      <main className={dashboardMainClassName}>
         <DailyUpdatesPanel
           showCreateButton
           title="Daily Application Updates"

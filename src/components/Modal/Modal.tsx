@@ -63,7 +63,7 @@ export function Modal(props: Props) {
                   className={cn(
                     props.panelClass,
                     { '!overflow-hidden': props.overflowHidden },
-                    '!pointer-events-auto relative mx-auto my-20 w-[430px] min-w-[200px] max-w-[90vw] rounded-lg bg-white shadow-xl',
+                    '!pointer-events-auto relative mx-auto my-10 w-full max-w-[min(430px,calc(100vw-2rem))] min-w-0 rounded-lg bg-white shadow-xl sm:my-20',
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -108,7 +108,7 @@ export function Modal(props: Props) {
                 <div
                   className={cn(
                     props.panelClass,
-                    '!pointer-events-auto absolute right-[16px] mx-auto grid h-[calc(100dvh_-_32px)] w-[497px] min-w-[200px] max-w-[90vw] grid-rows-1 overflow-hidden rounded-lg bg-white text-left shadow-xl',
+                    '!pointer-events-auto absolute inset-x-3 bottom-[max(1rem,env(safe-area-inset-bottom))] top-[max(1rem,env(safe-area-inset-top))] mx-auto grid h-auto max-h-none w-auto max-w-none grid-rows-1 overflow-hidden rounded-lg bg-white text-left shadow-xl sm:inset-x-auto sm:right-4 sm:top-4 sm:bottom-4 sm:h-[calc(100dvh-2rem)] sm:w-[min(497px,calc(100vw-2rem))]',
                     { '!grid-rows-[max-content_1fr]': !!props.title },
                   )}
                   onClick={(e) => {

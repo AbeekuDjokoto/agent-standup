@@ -5,6 +5,12 @@ import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import userLineIcon from '@/assets/svgs/user-line.svg';
 import { LOCATION_OPTIONS } from '@/data/locationOptions';
+import {
+  authCardClassName,
+  authCardHeaderClassName,
+  authCardSubtitleClassName,
+  authCardTitleClassName,
+} from '@/features/auth/authCardStyles';
 import { useAcceptAdminInviteForm } from '@/features/auth/hooks/useAcceptAdminInviteForm';
 import { ROUTES } from '@/utils/route-constants';
 import { cn } from '@/libs/cn';
@@ -48,15 +54,13 @@ function ModeToggle({
 
 function InvalidInviteLink() {
   return (
-    <section className="rounded-[36px] bg-white p-6">
-      <div className="flex flex-col items-center gap-2">
-        <div className="grid h-16 w-16 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
-          <img src={userLineIcon} alt="" className="h-8 w-8" aria-hidden />
+    <section className={authCardClassName}>
+      <div className={authCardHeaderClassName}>
+        <div className="grid h-14 w-14 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] sm:h-16 sm:w-16">
+          <img src={userLineIcon} alt="" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
         </div>
-        <h1 className="text-center text-2xl leading-8 font-medium text-neutral-grey-600">
-          Invalid invitation link
-        </h1>
-        <p className="max-w-[318px] text-center text-base leading-6 text-neutral-grey-500">
+        <h1 className={authCardTitleClassName}>Invalid invitation link</h1>
+        <p className={authCardSubtitleClassName}>
           This link is missing a token or has expired. Ask an administrator to
           send a new invite.
         </p>
@@ -66,7 +70,7 @@ function InvalidInviteLink() {
         to={ROUTES.user.auth.login}
         variant="auth"
         size="auth"
-        className="mt-6 w-full"
+        className="mt-4 w-full sm:mt-6"
       >
         Back to login
       </Button>
@@ -93,15 +97,13 @@ export function AcceptAdminInvite() {
   }
 
   return (
-    <section className="rounded-[28px] bg-white p-5 sm:rounded-[36px] sm:p-6">
-      <div className="flex flex-col items-center gap-1.5">
-        <div className="grid h-14 w-14 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
-          <img src={userLineIcon} alt="" className="h-8 w-8" aria-hidden />
+    <section className={authCardClassName}>
+      <div className={authCardHeaderClassName}>
+        <div className="grid h-14 w-14 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] sm:h-16 sm:w-16">
+          <img src={userLineIcon} alt="" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
         </div>
-        <h1 className="text-center text-xl leading-7 font-medium text-neutral-grey-600 sm:text-2xl sm:leading-8">
-          Accept admin invitation
-        </h1>
-        <p className="max-w-[318px] text-center text-sm leading-5 text-neutral-grey-500 sm:text-base sm:leading-6">
+        <h1 className={authCardTitleClassName}>Accept admin invitation</h1>
+        <p className={authCardSubtitleClassName}>
           {mode === 'existing'
             ? 'If you already have a Surge account (for example as an agent), accept with one click. Your account will be upgraded to administrator.'
             : 'Create your administrator profile to finish setting up access.'}

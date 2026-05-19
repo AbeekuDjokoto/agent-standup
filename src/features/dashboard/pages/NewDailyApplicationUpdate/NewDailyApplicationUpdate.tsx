@@ -8,6 +8,10 @@ import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { LOCATION_OPTIONS } from '@/data/locationOptions';
 import { ROUTES } from '@/utils/route-constants';
+import {
+  dashboardMainClassName,
+  dashboardPageClassName,
+} from '@/features/dashboard/dashboardPageStyles';
 import { useNewDailyApplicationUpdateForm } from '@/features/dashboard/hooks';
 
 export const NewDailyApplicationUpdate = () => {
@@ -22,11 +26,11 @@ export const NewDailyApplicationUpdate = () => {
   } = useNewDailyApplicationUpdateForm();
 
   return (
-    <div className="min-h-screen bg-[#f9fafa] p-4">
+    <div className={dashboardPageClassName}>
       <NavigationBar />
 
-      <main className="mx-auto mt-4 max-w-4xl">
-        <section className="rounded-xl bg-white p-6">
+      <main className={`${dashboardMainClassName} max-w-4xl`}>
+        <section className="rounded-xl bg-white p-4 sm:p-6">
           <button
             type="button"
             onClick={() => navigate(ROUTES.user.dashboard.dailyApplicationUpdates)}

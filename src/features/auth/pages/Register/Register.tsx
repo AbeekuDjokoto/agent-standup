@@ -6,6 +6,12 @@ import { Select } from '@/components/Select';
 import userLineIcon from '@/assets/svgs/user-line.svg';
 import { LOCATION_OPTIONS } from '@/data/locationOptions';
 import { ROUTES } from '@/utils/route-constants';
+import {
+  authCardClassName,
+  authCardHeaderClassName,
+  authCardSubtitleClassName,
+  authCardTitleClassName,
+} from '@/features/auth/authCardStyles';
 import { useRegisterForm } from '@/features/auth/hooks';
 
 export const Register = () => {
@@ -17,15 +23,13 @@ export const Register = () => {
   } = useRegisterForm();
 
   return (
-    <section className="rounded-[28px] bg-white p-5 sm:rounded-[36px] sm:p-6">
-      <div className="flex flex-col items-center gap-1.5">
+    <section className={authCardClassName}>
+      <div className={authCardHeaderClassName}>
         <div className="grid h-14 w-14 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
           <img src={userLineIcon} alt="" className="h-8 w-8" aria-hidden />
         </div>
-        <h1 className="text-center text-xl leading-7 font-medium text-neutral-grey-600 sm:text-2xl sm:leading-8">
-          Create your account
-        </h1>
-        <p className="max-w-[318px] text-center text-sm leading-5 text-neutral-grey-500 sm:text-base sm:leading-6">
+        <h1 className={authCardTitleClassName}>Create your account</h1>
+        <p className={authCardSubtitleClassName}>
           Register to start managing your daily applications and commissions.
         </p>
       </div>

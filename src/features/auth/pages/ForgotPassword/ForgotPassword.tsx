@@ -4,6 +4,12 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import userLineIcon from '@/assets/svgs/user-line.svg';
 import { ROUTES } from '@/utils/route-constants';
+import {
+  authCardClassName,
+  authCardHeaderClassName,
+  authCardSubtitleClassName,
+  authCardTitleClassName,
+} from '@/features/auth/authCardStyles';
 import { useForgotPasswordForm } from '@/features/auth/hooks/useForgotPasswordForm';
 import { ResetPassword } from '@/features/auth/pages/ResetPassword';
 
@@ -18,22 +24,20 @@ function ForgotPasswordRequestForm() {
   } = useForgotPasswordForm();
 
   return (
-    <section className="rounded-[36px] bg-white p-6">
-      <div className="flex flex-col items-center gap-2">
-        <div className="grid h-16 w-16 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
-          <img src={userLineIcon} alt="" className="h-8 w-8" aria-hidden />
+    <section className={authCardClassName}>
+      <div className={authCardHeaderClassName}>
+        <div className="grid h-14 w-14 place-items-center rounded-2xl border border-neutral-grey-100 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] sm:h-16 sm:w-16">
+          <img src={userLineIcon} alt="" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
         </div>
-        <h1 className="text-center text-2xl leading-8 font-medium text-neutral-grey-600">
-          Reset your password
-        </h1>
-        <p className="max-w-[318px] text-center text-base leading-6 text-neutral-grey-500">
+        <h1 className={authCardTitleClassName}>Reset your password</h1>
+        <p className={authCardSubtitleClassName}>
           {isSubmitted
             ? successMessage
             : 'Enter your email address and we will send reset instructions if an account exists for that email.'}
         </p>
       </div>
 
-      <div className="my-6 h-px bg-neutral-grey-100" />
+      <div className="my-4 h-px bg-neutral-grey-100 sm:my-6" />
 
       {isSubmitted ? (
         <Button
