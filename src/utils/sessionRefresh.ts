@@ -14,6 +14,18 @@ export function isLogoutRequestUrl(url?: string): boolean {
   return url.includes('/auth/logout');
 }
 
+/** Public auth endpoints — do not attach Bearer token. */
+export function isPublicAuthRequestUrl(url?: string): boolean {
+  if (!url) return false;
+  return (
+    url.includes('/auth/login') ||
+    url.includes('/auth/register') ||
+    url.includes('/auth/forgot-password') ||
+    url.includes('/auth/reset-password') ||
+    url.includes('/auth/accept-admin-invite')
+  );
+}
+
 export function isCookieAuthRequestUrl(url?: string): boolean {
   return isRefreshRequestUrl(url) || isLogoutRequestUrl(url);
 }

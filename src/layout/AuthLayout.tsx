@@ -3,16 +3,18 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import heroImage from '@/assets/images/hero-image.png';
 import { useSessionBootstrap } from '@/hooks/useSessionBootstrap';
 import { useAuthStore } from '@/stores';
-import { getPostLoginPath, getUserRoles } from '@/utils/auth';
+import {
+  getPostLoginPath,
+  getUserRoles,
+  isAcceptAdminInvitePath,
+} from '@/utils/auth';
 import { ROUTES } from '@/utils/route-constants';
 
 export const AuthLayout = () => {
   const { isReady, sessionValid } = useSessionBootstrap();
   const user = useAuthStore((state) => state.user);
   const { pathname } = useLocation();
-  const isAcceptAdminInvite = pathname.startsWith(
-    ROUTES.user.auth.acceptAdminInvite,
-  );
+  const isAcceptAdminInvite = isAcceptAdminInvitePath(pathname);
 
   if (!isReady) {
     return null;

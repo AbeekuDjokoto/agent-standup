@@ -105,6 +105,14 @@ export function getForgotPasswordSuccessMessage(
   return response?.message?.trim() || FORGOT_PASSWORD_SUCCESS_MESSAGE;
 }
 
+/** Invite acceptance pages (logged-in users may still open the link). */
+export function isAcceptAdminInvitePath(pathname: string): boolean {
+  return (
+    pathname.startsWith(ROUTES.user.auth.acceptInvite) ||
+    pathname.startsWith(ROUTES.user.auth.acceptAdminInvite)
+  );
+}
+
 export function getResetPasswordPathFromUrl(resetUrl: string): string {
   try {
     const { pathname, search } = new URL(resetUrl);

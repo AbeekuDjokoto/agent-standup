@@ -10,6 +10,9 @@ export const ROUTES = {
       createAccountWithEmail: '/auth/create-account/email',
       createAccountWithPhone: '/auth/create-account/phone',
       setPassword: '/auth/set-password',
+      /** Canonical path used in admin invite emails (ADMIN_INVITE_URL_BASE). */
+      acceptInvite: '/auth/accept-invite',
+      /** Legacy alias — redirects to acceptInvite preserving query params. */
       acceptAdminInvite: '/auth/accept-admin-invite',
     },
     dashboard: {

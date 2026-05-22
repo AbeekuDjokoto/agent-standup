@@ -5,6 +5,7 @@ import { ENV_VARS } from '@/utils/constants';
 import {
   isCookieAuthRequestUrl,
   isLogoutRequestUrl,
+  isPublicAuthRequestUrl,
   isRefreshRequestUrl,
   shouldProactivelyRefresh,
   shouldSyncAuthFromResponse,
@@ -62,7 +63,12 @@ instance.interceptors.request.use(
 
     const { token, isSessionValid } = useAuthStore.getState();
 
-    if (token && isSessionValid() && !isCookieAuthRequestUrl(requestUrl)) {
+    if (
+      token &&
+      isSessionValid() &&
+      !isCookieAuthRequestUrl(requestUrl) &&
+      !isPublicAuthRequestUrl(requestUrl)
+    ) {
       request.headers.Authorization = `Bearer ${token}`;
     }
 

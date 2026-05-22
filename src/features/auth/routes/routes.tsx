@@ -12,6 +12,17 @@ function LegacyAuthResetPasswordRedirect() {
   );
 }
 
+/** Email links may use /auth/accept-admin-invite; canonical path is /auth/accept-invite. */
+function AcceptAdminInviteLegacyRedirect() {
+  const { search } = useLocation();
+  return (
+    <Navigate
+      to={`${ROUTES.user.auth.acceptInvite}${search}`}
+      replace
+    />
+  );
+}
+
 export const userAuthRoutes: RouteObject[] = [
   {
     index: true,
@@ -26,8 +37,12 @@ export const userAuthRoutes: RouteObject[] = [
     element: <Register />,
   },
   {
-    path: ROUTES.user.auth.acceptAdminInvite.replace('/auth/', ''),
+    path: ROUTES.user.auth.acceptInvite.replace('/auth/', ''),
     element: <AcceptAdminInvite />,
+  },
+  {
+    path: ROUTES.user.auth.acceptAdminInvite.replace('/auth/', ''),
+    element: <AcceptAdminInviteLegacyRedirect />,
   },
   {
     path: 'forgot-password',
