@@ -3,7 +3,6 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import heroImage from '@/assets/images/hero-image.png';
 import { useSessionBootstrap } from '@/hooks/useSessionBootstrap';
 import { SessionLoadingScreen } from '@/layout/SessionLoadingScreen';
-import { viewportMinHeightClassName } from '@/layout/layoutStyles';
 import { useAuthStore } from '@/stores';
 import {
   getPostLoginPath,
@@ -26,8 +25,8 @@ export const AuthLayout = () => {
   }
 
   return (
-    <main className={`${viewportMinHeightClassName} bg-[#f9fafa] sm:p-4`}>
-      <section className="mx-auto flex min-h-viewport w-full min-w-0 flex-col bg-[#f9fafa] sm:min-h-viewport-inset-sm lg:grid lg:max-h-viewport-inset-sm lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:rounded-[24px] lg:overflow-hidden">
+    <main className="auth-viewport-shell h-viewport overflow-hidden bg-[#f9fafa] sm:p-4">
+      <section className="mx-auto flex h-full min-h-0 w-full min-w-0 flex-col bg-[#f9fafa] lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-[24px]">
         <aside className="relative hidden min-h-0 overflow-hidden rounded-[22px] lg:block">
           <img
             src={heroImage}
@@ -49,11 +48,13 @@ export const AuthLayout = () => {
           </div>
         </aside>
 
-        <section className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto overflow-x-hidden px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 sm:py-6 lg:justify-center lg:px-10">
-          <div className="my-auto w-full min-w-0 max-w-[440px] py-4">
-            <Outlet />
+        <section className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 sm:py-4 lg:px-10">
+          <div className="flex w-full min-w-0 flex-1 flex-col justify-center py-2">
+            <div className="mx-auto w-full min-w-0 max-w-[440px]">
+              <Outlet />
+            </div>
           </div>
-          <p className="mt-4 shrink-0 pb-2 text-center text-xs text-neutral-grey-500 sm:mt-6 sm:text-sm">
+          <p className="shrink-0 pb-1 pt-2 text-center text-xs text-neutral-grey-500 sm:text-sm">
             © 2026 Surge Africa
           </p>
         </section>

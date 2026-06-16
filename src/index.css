@@ -37,6 +37,11 @@ body,
   overflow-x: clip;
 }
 
+body:has(.auth-viewport-shell) #root {
+  height: 100%;
+  overflow: hidden;
+}
+
 /* Viewport height helpers — vh fallback, dvh for mobile Safari toolbars. */
 .min-h-viewport {
   min-height: 100vh;
@@ -67,8 +72,16 @@ body {
   margin: 0;
   min-width: 0;
   overflow-x: clip;
+  overflow-y: auto;
   font-family: 'Inter', 'Inter Display', sans-serif;
   background: #f9fafa;
+}
+
+/* Auth shell locks the page; form column scrolls internally when needed. */
+body:has(.auth-viewport-shell) {
+  overflow: hidden;
+  height: 100vh;
+  height: 100dvh;
 }
 
 /* iOS Safari zooms focused fields below 16px and can trap scroll with overflow hidden. */
