@@ -66,17 +66,22 @@ export function useAgentProfileActivity(agentUuid: string | null) {
 
       setAgent(profileResponse.user);
       setUpdates(
-        activityResponse.items.map((item) => ({
-          id: item.id,
-          agentUuid: item.agent_uuid,
-          agentName: item.agent_full_name,
-          plan: 'Daily Update',
-          location: item.location,
-          applicationsCount: item.applications,
-          loanAmount: item.total_amount,
-          status: 'Submitted' as const,
-          date: formatActivityDate(item.date || item.submitted),
-        })),
+        activityResponse.items.map((item) => {
+          const reportingDate = item.date || item.submitted.slice(0, 10);
+
+          return {
+            id: item.id,
+            agentUuid: item.agent_uuid,
+            agentName: item.agent_full_name,
+            plan: 'Daily Update',
+            location: item.location,
+            applicationsCount: item.applications,
+            loanAmount: item.total_amount,
+            status: 'Submitted' as const,
+            reportingDate,
+            date: formatActivityDate(reportingDate),
+          };
+        }),
       );
       setSummary(activityResponse.summary);
     } catch (error) {

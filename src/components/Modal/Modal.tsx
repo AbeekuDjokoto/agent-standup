@@ -50,7 +50,7 @@ export function Modal(props: Props) {
           {/* CENTER */}
           {position === 'center' ? (
             <Dialog.Content asChild>
-              <motion.div className="modal-content !pointer-events-none fixed inset-0 z-[200] grid min-h-full items-center justify-center overflow-y-auto py-10 focus:outline-none">
+              <motion.div className="modal-content !pointer-events-none fixed inset-0 z-[200] grid min-h-viewport items-center justify-center overflow-y-auto py-10 focus:outline-none">
                 <motion.div
                   initial={{ scale: 0.7, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -92,7 +92,7 @@ export function Modal(props: Props) {
           {position === 'side' ? (
             <Dialog.Content asChild>
               <motion.div
-                className="modal-content !pointer-events-none fixed inset-0 z-[200] grid min-h-full items-center justify-center overflow-y-auto py-10 focus:outline-none"
+                className="modal-content !pointer-events-none fixed inset-0 z-[200] grid min-h-viewport items-center justify-center overflow-y-auto py-10 focus:outline-none"
                 initial={{ x: 600 }}
                 animate={{ x: 0 }}
                 transition={{
@@ -108,7 +108,7 @@ export function Modal(props: Props) {
                 <div
                   className={cn(
                     props.panelClass,
-                    '!pointer-events-auto absolute inset-x-3 bottom-[max(1rem,env(safe-area-inset-bottom))] top-[max(1rem,env(safe-area-inset-top))] mx-auto grid h-auto max-h-none w-auto max-w-none grid-rows-1 overflow-hidden rounded-lg bg-white text-left shadow-xl sm:inset-x-auto sm:right-4 sm:top-4 sm:bottom-4 sm:h-[calc(100dvh-2rem)] sm:w-[min(497px,calc(100vw-2rem))]',
+                    '!pointer-events-auto absolute inset-x-3 bottom-[max(1rem,env(safe-area-inset-bottom))] top-[max(1rem,env(safe-area-inset-top))] mx-auto grid h-auto max-h-none w-auto max-w-none grid-rows-1 overflow-hidden rounded-lg bg-white text-left shadow-xl sm:inset-x-auto sm:right-4 sm:top-4 sm:bottom-4 sm:h-viewport-inset-sm sm:w-[min(497px,calc(100vw-2rem))]',
                     { '!grid-rows-[max-content_1fr]': !!props.title },
                   )}
                   onClick={(e) => {

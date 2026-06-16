@@ -16,6 +16,8 @@ import {
 } from '@/utils/auth';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
+import { buildPerformanceChartData } from '../utils/buildPerformanceChartData';
+
 export type DateFilterPreset = 'all' | 'today' | 'week';
 
 export type DailyUpdateRecord = {
@@ -27,6 +29,8 @@ export type DailyUpdateRecord = {
   applicationsCount: number;
   loanAmount: number;
   status: 'Submitted';
+  /** Raw YYYY-MM-DD for sorting and charts. */
+  reportingDate: string;
   date: string;
 };
 
@@ -52,6 +56,8 @@ function mapItemToRecord(item: {
   submitted: string;
   date: string;
 }): DailyUpdateRecord {
+  const reportingDate = item.date || item.submitted.slice(0, 10);
+
   return {
     id: item.id,
     agentUuid: item.agent_uuid,
@@ -61,7 +67,8 @@ function mapItemToRecord(item: {
     applicationsCount: item.applications,
     loanAmount: item.total_amount,
     status: 'Submitted',
-    date: formatActivityDate(item.date || item.submitted),
+    reportingDate,
+    date: formatActivityDate(reportingDate),
   };
 }
 
@@ -182,10 +189,13 @@ export function useDailyUpdatesList({
     { label: 'Last Update', value: lastUpdate },
   ];
 
+  const performanceChartData = buildPerformanceChartData(dailyUpdates);
+
   return {
     isAdmin,
     dailyUpdates,
     summaryStats,
+    performanceChartData,
     dateFilter,
     setDateFilter,
     isLoading: !isSessionReady || isLoading,

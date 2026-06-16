@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { FormAlert } from '@/components/FormAlert';
+import { AgentPerformanceChart } from '@/features/dashboard/components/AgentPerformanceChart';
 import { AgentProfileModal } from '@/features/dashboard/components/AgentProfileModal';
 import { DailyActivityDetailModal } from '@/features/dashboard/components/DailyActivityDetailModal';
 import { DailyUpdateCard } from '@/features/dashboard/components/DailyUpdateCard';
@@ -55,6 +56,7 @@ export function DailyUpdatesPanel({
     isAdmin,
     dailyUpdates,
     summaryStats,
+    performanceChartData,
     dateFilter,
     setDateFilter,
     isLoading,
@@ -201,6 +203,14 @@ export function DailyUpdatesPanel({
       </section>
 
       <DailyUpdatesSummary stats={summaryStats} />
+
+      {!isAdmin ? (
+        <AgentPerformanceChart
+          data={performanceChartData}
+          dateFilter={dateFilter}
+          isLoading={isLoading}
+        />
+      ) : null}
 
       {loadError ? (
         <FormAlert className="rounded-xl">{loadError}</FormAlert>

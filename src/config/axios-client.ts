@@ -2,6 +2,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 import { useAuthStore } from '@/stores';
 import { ENV_VARS } from '@/utils/constants';
+import { isAuthSessionValid } from '@/utils/auth';
 import {
   isCookieAuthRequestUrl,
   isLogoutRequestUrl,
@@ -120,12 +121,16 @@ instance.interceptors.response.use(
         return instance(originalRequest);
       }
 
-      useAuthStore.getState().reset();
+      if (!isAuthSessionValid(useAuthStore.getState())) {
+        useAuthStore.getState().reset();
+      }
     } else if (
       status === 401 &&
       (isRefreshRequestUrl(requestUrl) || isLogoutRequestUrl(requestUrl))
     ) {
-      useAuthStore.getState().reset();
+      if (!isAuthSessionValid(useAuthStore.getState())) {
+        useAuthStore.getState().reset();
+      }
     }
 
     return errorHandler(error);

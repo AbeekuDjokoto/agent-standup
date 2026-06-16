@@ -22,22 +22,24 @@ export function useSessionBootstrap() {
     let cancelled = false;
 
     async function bootstrap() {
-      const state = useAuthStore.getState();
+      try {
+        const state = useAuthStore.getState();
 
-      if (!isAuthSessionValid(state)) {
-        const refreshed = await tryRefreshSession();
+        if (!isAuthSessionValid(state)) {
+          const refreshed = await tryRefreshSession();
 
-        if (!refreshed && state.isAuthenticated) {
-          useAuthStore.getState().reset();
+          if (!refreshed && state.isAuthenticated) {
+            useAuthStore.getState().reset();
+          }
         }
-      }
 
-      if (isAuthSessionValid(useAuthStore.getState())) {
-        await syncCurrentUser();
-      }
-
-      if (!cancelled) {
-        setIsReady(true);
+        if (isAuthSessionValid(useAuthStore.getState())) {
+          await syncCurrentUser();
+        }
+      } finally {
+        if (!cancelled) {
+          setIsReady(true);
+        }
       }
     }
 

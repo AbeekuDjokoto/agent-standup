@@ -2,13 +2,14 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import heroImage from '@/assets/images/hero-image.png';
 import { useSessionBootstrap } from '@/hooks/useSessionBootstrap';
+import { SessionLoadingScreen } from '@/layout/SessionLoadingScreen';
+import { viewportMinHeightClassName } from '@/layout/layoutStyles';
 import { useAuthStore } from '@/stores';
 import {
   getPostLoginPath,
   getUserRoles,
   isAcceptAdminInvitePath,
 } from '@/utils/auth';
-import { ROUTES } from '@/utils/route-constants';
 
 export const AuthLayout = () => {
   const { isReady, sessionValid } = useSessionBootstrap();
@@ -17,7 +18,7 @@ export const AuthLayout = () => {
   const isAcceptAdminInvite = isAcceptAdminInvitePath(pathname);
 
   if (!isReady) {
-    return null;
+    return <SessionLoadingScreen />;
   }
 
   if (sessionValid && !isAcceptAdminInvite) {
@@ -25,8 +26,8 @@ export const AuthLayout = () => {
   }
 
   return (
-    <main className="min-h-[100dvh] bg-[#f9fafa] sm:p-4">
-      <section className="mx-auto flex min-h-[100dvh] w-full min-w-0 flex-col bg-[#f9fafa] sm:min-h-[calc(100dvh-2rem)] lg:grid lg:max-h-[calc(100dvh-2rem)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:rounded-[24px] lg:overflow-hidden">
+    <main className={`${viewportMinHeightClassName} bg-[#f9fafa] sm:p-4`}>
+      <section className="mx-auto flex min-h-viewport w-full min-w-0 flex-col bg-[#f9fafa] sm:min-h-viewport-inset-sm lg:grid lg:max-h-viewport-inset-sm lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:rounded-[24px] lg:overflow-hidden">
         <aside className="relative hidden min-h-0 overflow-hidden rounded-[22px] lg:block">
           <img
             src={heroImage}

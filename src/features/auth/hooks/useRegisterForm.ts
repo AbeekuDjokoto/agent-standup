@@ -8,6 +8,12 @@ import {
   registerSchema,
 } from '@/features/auth/pages/Register/registerSchema';
 import { registerUser } from '@/services/authService';
+import { useAuthStore } from '@/stores';
+import {
+  getPostLoginPath,
+  getUserRoles,
+  isAuthSessionValid,
+} from '@/utils/auth';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { ROUTES } from '@/utils/route-constants';
 
@@ -42,7 +48,14 @@ export function useRegisterForm() {
         location_station: values.locationStation,
       });
 
-      navigate(ROUTES.user.auth.login);
+      const session = useAuthStore.getState();
+
+      if (isAuthSessionValid(session)) {
+        navigate(getPostLoginPath(getUserRoles(session.user)), { replace: true });
+        return;
+      }
+
+      navigate(ROUTES.user.auth.login, { replace: true });
     } catch (error) {
       setError('root', {
         type: 'server',
